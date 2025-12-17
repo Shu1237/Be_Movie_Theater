@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import * as crypto from 'crypto';
-import * as qs from 'qs';
-import * as moment from 'moment';
+import  crypto from 'crypto';
+import   qs from 'qs';
+import moment from 'moment';
 import { StatusOrder } from 'src/common/enums/status-order.enum';
 import { ConfigService } from '@nestjs/config';
 import { InternalServerErrorException } from 'src/common/exceptions/internal-server-error.exception';
 import { AbstractPaymentService } from '../base/abstract-payment.service';
-import { MailerService } from '@nestjs-modules/mailer';
+import { MailService } from "src/common/mail/mail.service";
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MyGateWay } from 'src/common/gateways/seat.gateway';
@@ -40,7 +40,7 @@ export class VnpayService extends AbstractPaymentService {
     userRepository: Repository<User>,
     @InjectRepository(OrderExtra)
     orderExtraRepository: Repository<OrderExtra>,
-    mailerService: MailerService,
+    mailerService: MailService,
     gateway: MyGateWay,
     qrCodeService: QrCodeService,
     configService: ConfigService,

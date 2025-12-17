@@ -111,23 +111,23 @@ export class TicketController {
     example: 'ASC',
   })
   @ApiBearerAuth()
-  async getTicketsByUserId(@Req() req, @Query() query: TicketPaginationDto) {
-    const user = req.user as JWTUserType;
-    const { page = 1, take = 10, ...restFilters } = query;
+  // async getTicketsByUserId(@Req() req, @Query() query: TicketPaginationDto) {
+  //   const user = req.user as JWTUserType;
+  //   const { page = 1, take = 10, ...restFilters } = query;
 
-    return this.ticketService.getTicketsByUserId({
-      page,
-      take: Math.min(take, 100),
-      ...restFilters,
-      userId: user.account_id,
-    });
-  }
+  //   return this.ticketService.getTicketsByUserId({
+  //     page,
+  //     take: Math.min(take, 100),
+  //     ...restFilters,
+  //     userId: user.account_id,
+  //   });
+  // }
 
   // GET - Get ticket by ID
   @Get(':id')
   @ApiOperation({ summary: 'Get ticket by ID' })
   @ApiBearerAuth()
-  getTicketById(@Param('id') id: string) {
+  getTicketById(@Param('id') id: number) {
     return this.ticketService.getTicketById(id);
   }
 }

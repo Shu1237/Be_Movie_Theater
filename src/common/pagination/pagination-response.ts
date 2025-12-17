@@ -17,7 +17,7 @@ export function buildPaginationResponse<T>(data: T[], meta: MetaOptions) {
     meta: {
       total,
       page,
-      pageSize: take,
+      take,
       totalPages: Math.ceil(total / take),
       ...(totalSuccess !== undefined && { totalSuccess }),
       ...(totalFailed !== undefined && { totalFailed }),

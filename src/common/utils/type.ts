@@ -4,44 +4,23 @@ import { AudienceType } from '../enums/audience_type.enum';
 import { StatusOrderWithAllType } from '../enums/status-order.enum';
 import { SelectQueryBuilder } from 'typeorm';
 
-export type CreateAccountType = {
-  address: string;
-  date_of_birth: Date;
-  email: string;
-  gender: boolean;
-  identity_card: string;
-  image?: string;
-  password: string;
-  phone_number: string;
-  username: string;
-  role_id?: number;
-};
 
-export type LogoutType = {
-  refresh_token: string;
-};
 
-export type LoginType = {
-  username: string;
-  password: string;
-};
-export type changePasswordType = {
-  newPassword: string;
-  token: string;
-};
-export type RefreshTokenType = {
-  refresh_token: string;
-};
+
+
+
 export type JWTUserType = {
   account_id: string;
   username: string;
+  email:string;
+  provider: 'local' | 'google';
   role_id: Role;
 };
 
 export type GoogleUserType = {
   email: string;
-  avatarUrl: string;
-  password?: string;
+  avatar?: string | null;
+  gender:Gender;
 };
 export type ProductOrderItem = {
   product_id: number;

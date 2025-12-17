@@ -10,7 +10,7 @@ import { OnModuleInit, Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import * as jwt from 'jsonwebtoken';
 import { SeatService } from 'src/modules/seat/seat.service';
-import { HoldSeatType, JWTUserType } from 'src/common/utils/type';
+import type { HoldSeatType, JWTUserType } from 'src/common/utils/type';
 import { ConfigService } from '@nestjs/config';
 import { StatusSeat } from '../enums/status_seat.enum';
 

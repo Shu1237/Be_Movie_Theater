@@ -11,6 +11,8 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { QrCodeModule } from 'src/common/qrcode/qr.module';
+import { RedisModule } from 'src/common/redis/redis.module';
+
 
 @Module({
   imports: [
@@ -25,6 +27,7 @@ import { QrCodeModule } from 'src/common/qrcode/qr.module';
       }),
     }),
     QrCodeModule,
+    RedisModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy],

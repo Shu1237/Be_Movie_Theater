@@ -3,14 +3,14 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import * as crypto from 'crypto';
+import  crypto from 'crypto';
 import axios from 'axios';
-import * as moment from 'moment';
-import * as dayjs from 'dayjs';
+import  moment from 'moment';
+import  dayjs from 'dayjs';
 import { OrderBillType } from 'src/common/utils/type';
 import { StatusOrder } from 'src/common/enums/status-order.enum';
 import { ConfigService } from '@nestjs/config';
-import { MailerService } from '@nestjs-modules/mailer';
+import { MailService } from "src/common/mail/mail.service";
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MyGateWay } from 'src/common/gateways/seat.gateway';
@@ -43,7 +43,7 @@ export class ZalopayService extends AbstractPaymentService {
     userRepository: Repository<User>,
     @InjectRepository(OrderExtra)
     orderExtraRepository: Repository<OrderExtra>,
-    mailerService: MailerService,
+    mailerService: MailService,
     gateway: MyGateWay,
     qrCodeService: QrCodeService,
     configService: ConfigService,

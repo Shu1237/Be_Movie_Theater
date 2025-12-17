@@ -1,11 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MailerModule } from '@nestjs-modules/mailer';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { PassportModule } from '@nestjs/passport';
 import { ScheduleModule } from '@nestjs/schedule';
-import * as path from 'path';
 import configuration from './common/config/config';
 import { allEntities } from './database';
 
@@ -24,12 +21,12 @@ import { SeatModule } from './modules/seat/seat.module';
 import { TicketModule } from './modules/ticket/ticket.module';
 import { CronModule } from './common/cron/cron.module';
 import { MyGateWayModule } from './common/gateways/seat.gateway.module';
-import { S3Module } from './common/s3/s3.module';
 import { ScheduleSeatModule } from './modules/scheduleseat/scheduleseat.module';
 import { ProductModule } from './modules/product/product.module';
 import { HistoryScoreModule } from './modules/historyScore/historyScore.module';
 import { PaymentMethodModule } from './modules/payment-method/payment-method.module';
 import { OverviewModule } from './modules/overview/overview.module';
+import { RedisModule } from './common/redis/redis.module';
 
 @Module({
   imports: [
@@ -55,35 +52,13 @@ import { OverviewModule } from './modules/overview/overview.module';
         password: configService.get<string>('database.password'),
         database: configService.get<string>('database.name'),
         entities: allEntities,
-        synchronize: false,
+        synchronize: true,
         autoLoadEntities: true,
       }),
       inject: [ConfigService],
     }),
 
-    MailerModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        transport: {
-          host: configService.get('gmail.host'),
-          port: configService.get<number>('gmail.port'),
-          secure: false,
-          auth: {
-            user: configService.get('gmail.user'),
-            pass: configService.get('gmail.pass'),
-          },
-        },
-        defaults: {
-          from: '"BeMovie Team 1-3" <noreply@bemovie.com>',
-        },
-        template: {
-          dir: path.join(__dirname, '..', 'template'),
-          adapter: new HandlebarsAdapter(),
-          options: { strict: true },
-        },
-      }),
-      inject: [ConfigService],
-    }),
+
 
     // Application Modules
     ActorModule,
@@ -104,10 +79,11 @@ import { OverviewModule } from './modules/overview/overview.module';
     UserModule,
     VersionModule,
 
+    RedisModule
     // Shared Modules
-    CronModule,
-    MyGateWayModule,
-    S3Module,
+    // CronModule,
+    // MyGateWayModule,
+    // S3Module,
   ],
 })
 export class AppModule {}

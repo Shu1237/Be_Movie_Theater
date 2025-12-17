@@ -4,7 +4,7 @@ import {
   Param,
   ParseIntPipe,
   Query,
-  Req,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { HistoryScoreService } from './historyScore.service';
@@ -99,7 +99,7 @@ export class HistoryScoreController {
   })
   getHistoryScoreByUserId(
     @Query() query: HistoryScorePaginationDto,
-    @Req() req,
+    @Request() req :{ user: JWTUserType },
   ) {
     const user = req.user as JWTUserType;
     const { page = 1, take = 10, ...restFilters } = query;

@@ -13,20 +13,20 @@ import { gerneFieldMapping } from 'src/common/pagination/fillters/gerne-field-ma
 import { applySorting } from 'src/common/pagination/apply_sort';
 import { applyPagination } from 'src/common/pagination/applyPagination';
 import { buildPaginationResponse } from 'src/common/pagination/pagination-response';
+import { ResponseDetail } from 'src/common/response/response-detail-create-update';
+import { ResponseList } from 'src/common/response/response-list';
+import { ResponseMsg } from 'src/common/response/response-message';
 
 @Injectable()
 export class GerneService {
   constructor(
     @InjectRepository(Gerne)
     private readonly gerneRepository: Repository<Gerne>,
-  ) { }
-  async getAllGernesUser(): Promise<Gerne[]> {
-    return await this.gerneRepository.find({
-      where: { is_deleted: false },
-      relations: ['movies'],
-    });
-  }
-  async createGerne(createGerneDto: CreateGerneDto): Promise<{ msg: string }> {
+  ) {}
+
+  async createGerne(
+    createGerneDto: CreateGerneDto,
+  ): Promise<ResponseDetail<Gerne>> {
     const existing = await this.gerneRepository.findOne({
       where: { genre_name: createGerneDto.genre_name },
     });
@@ -39,10 +39,12 @@ export class GerneService {
 
     const newGerne = this.gerneRepository.create(createGerneDto);
     await this.gerneRepository.save(newGerne);
-    return { msg: 'Gerne created successfully' };
+    return ResponseDetail.ok(newGerne);
   }
 
-  async findAllGernes(filters: GernePaginationDto): Promise<ReturnType<typeof buildPaginationResponse>> {
+  async findAllGernes(
+    filters: GernePaginationDto,
+  ): Promise<ResponseList<Gerne>> {
     const qb = this.gerneRepository.createQueryBuilder('gerne');
 
     applyCommonFilters(qb, filters, gerneFieldMapping);
@@ -64,65 +66,76 @@ export class GerneService {
     const [gernes, total] = await qb.getManyAndCount();
 
     // Get counts for active and deleted genres
-    const counts = await this.gerneRepository
+    const counts = (await this.gerneRepository
       .createQueryBuilder('gerne')
       .select([
         `SUM(CASE WHEN gerne.is_deleted = false THEN 1 ELSE 0 END) AS activeCount`,
         `SUM(CASE WHEN gerne.is_deleted = true THEN 1 ELSE 0 END) AS deletedCount`,
       ])
-      .getRawOne() || { activeCount: 0, deletedCount: 0 };
+      .getRawOne()) || { activeCount: 0, deletedCount: 0 };
 
     const activeCount = Number(counts?.activeCount) || 0;
     const deletedCount = Number(counts?.deletedCount) || 0;
 
-    return buildPaginationResponse(gernes, {
-      page: filters.page,
-      take: filters.take,
-      total,
-      activeCount,
-      deletedCount,
-    });
+    return ResponseList.ok(
+      buildPaginationResponse(gernes, {
+        total,
+        page: filters.page,
+        take: filters.take,
+        activeCount,
+        deletedCount,
+      }),
+    );
   }
 
-  async findGerneById(id: number): Promise<Gerne> {
+  async findGerneById(id: number): Promise<ResponseDetail<Gerne>> {
     const gerne = await this.gerneRepository.findOne({ where: { id } });
     if (!gerne) {
       throw new NotFoundException(`Gerne with ID ${id} not found`);
     }
-    return gerne;
+    return ResponseDetail.ok(gerne);
   }
 
   async updateGerne(
     id: number,
     updateGerneDto: UpdateGerneDto,
-  ): Promise<{ msg: string }> {
-    const gerne = await this.findGerneById(id);
+  ): Promise<ResponseDetail<Gerne | null>> {
+    const gerneRes = await this.findGerneById(id);
 
+    if (!gerneRes.data) {
+      throw new NotFoundException(`Gerne with ID ${id} not found`);
+    }
 
     if (
       updateGerneDto.genre_name &&
-      updateGerneDto.genre_name !== gerne.genre_name
+      updateGerneDto.genre_name !== gerneRes.data.genre_name
     ) {
       const existing = await this.gerneRepository.findOne({
         where: { genre_name: updateGerneDto.genre_name },
       });
 
       if (existing) {
-        throw new Error(`Gerne "${updateGerneDto.genre_name}" already exists`);
+        throw new BadRequestException(
+          `Gerne "${updateGerneDto.genre_name}" already exists`,
+        );
       }
     }
 
     await this.gerneRepository.update(id, updateGerneDto);
-    return { msg: 'Gerne updated successfully' };
+
+    const updatedGerne = await this.gerneRepository.findOneBy({ id });
+
+    return ResponseDetail.ok(updatedGerne);
   }
 
-  async deleteGerne(id: number): Promise<void> {
+  async deleteGerne(id: number): Promise<ResponseMsg> {
     const result = await this.gerneRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`Gerne with ID ${id} not found`);
     }
+    return ResponseMsg.ok('Gerne deleted successfully');
   }
-  async softDeleteGerne(id: number): Promise<{ msg: string; gerne: Gerne }> {
+  async softDeleteGerne(id: number): Promise<ResponseMsg> {
     const gerne = await this.gerneRepository.findOne({ where: { id } });
     if (!gerne) {
       throw new NotFoundException(`Gerne with ID ${id} not found`);
@@ -131,10 +144,10 @@ export class GerneService {
     gerne.is_deleted = true;
     await this.gerneRepository.save(gerne);
 
-    return { msg: 'Gerne soft-deleted successfully', gerne };
+    return ResponseMsg.ok('Gerne soft-deleted successfully');
   }
 
-  async restoreGerne(id: number): Promise<{ msg: string; gerne: Gerne }> {
+  async restoreGerne(id: number): Promise<ResponseMsg> {
     const gerne = await this.gerneRepository.findOne({ where: { id } });
     if (!gerne) {
       throw new NotFoundException(`Gerne with ID ${id} not found`);
@@ -144,19 +157,6 @@ export class GerneService {
     }
     gerne.is_deleted = false;
     await this.gerneRepository.save(gerne);
-    return { msg: 'Gerne restored successfully', gerne };
-  }
-
-  async getMoviesOfGerne(gerneId: number): Promise<Movie[]> {
-    const gerne = await this.gerneRepository.findOne({
-      where: { id: gerneId },
-      relations: ['movies'],
-    });
-
-    if (!gerne) {
-      throw new NotFoundException(`Gerne with ID ${gerneId} not found`);
-    }
-
-    return gerne.movies;
+    return ResponseMsg.ok('Gerne restored successfully');
   }
 }

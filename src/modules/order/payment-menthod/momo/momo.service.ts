@@ -3,14 +3,14 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import * as crypto from 'crypto';
+import  crypto from 'crypto';
 import axios from 'axios';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Transaction } from 'src/database/entities/order/transaction';
 import { Order } from 'src/database/entities/order/order';
 import { Ticket } from 'src/database/entities/order/ticket';
-import { MailerService } from '@nestjs-modules/mailer';
+import { MailService } from "src/common/mail/mail.service";
 import { ScheduleSeat } from 'src/database/entities/cinema/schedule_seat';
 import { StatusOrder } from 'src/common/enums/status-order.enum';
 import { HistoryScore } from 'src/database/entities/order/history_score';
@@ -40,7 +40,7 @@ export class MomoService extends AbstractPaymentService {
     userRepository: Repository<User>,
     @InjectRepository(OrderExtra)
     orderExtraRepository: Repository<OrderExtra>,
-    mailerService: MailerService,
+    mailerService: MailService,
     gateway: MyGateWay,
     qrCodeService: QrCodeService,
     configService: ConfigService,

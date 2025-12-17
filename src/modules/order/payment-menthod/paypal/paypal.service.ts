@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MailerService } from '@nestjs-modules/mailer';
+import { MailService } from "src/common/mail/mail.service";
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import axios from 'axios';
@@ -39,7 +39,7 @@ export class PayPalService extends AbstractPaymentService {
     userRepository: Repository<User>,
     @InjectRepository(OrderExtra)
     orderExtraRepository: Repository<OrderExtra>,
-    mailerService: MailerService,
+    mailerService: MailService,
     gateway: MyGateWay,
     qrCodeService: QrCodeService,
     configService: ConfigService,

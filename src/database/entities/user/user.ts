@@ -10,6 +10,7 @@ import { RefreshToken } from './refresh-token';
 import { Order } from '../order/order';
 import { HistoryScore } from '../order/history_score';
 import { Role } from './roles';
+import { Gender } from 'src/common/enums/gender.enum';
 
 @Entity('user')
 export class User {
@@ -20,10 +21,13 @@ export class User {
   username: string;
 
   @Column({ type: 'varchar', length: 255 })
-  sub: string;
+  password: string;
 
   @Column({ type: 'varchar', length: 255, unique: true })
   email: string;
+
+  @Column({ type: 'enum', enum: Gender, default: Gender.UNKNOWN })
+  gender: Gender;
 
   @Column({ type: 'varchar', length: 500, nullable: true })
   avatar?: string;
@@ -36,6 +40,9 @@ export class User {
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   qr_code: string;
+
+  @Column({ default: 'local' })
+  provider: 'local' | 'google';
 
   @ManyToOne(() => Role, (role) => role.users)
   @JoinColumn({ name: 'role_id' })

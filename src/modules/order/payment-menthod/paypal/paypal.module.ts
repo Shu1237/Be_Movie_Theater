@@ -5,7 +5,7 @@ import { Transaction } from 'src/database/entities/order/transaction';
 import { Order } from 'src/database/entities/order/order';
 import { Ticket } from 'src/database/entities/order/ticket';
 import { User } from 'src/database/entities/user/user';
-import { MailerModule } from '@nestjs-modules/mailer';
+import { MailModule } from "src/common/mail/mail.module";
 import { ScheduleSeat } from 'src/database/entities/cinema/schedule_seat';
 import { HistoryScore } from 'src/database/entities/order/history_score';
 import { OrderExtra } from 'src/database/entities/order/order-extra';
@@ -25,7 +25,7 @@ import { ConfigService } from '@nestjs/config';
       HistoryScore,
       User,
     ]),
-    MailerModule,
+    MailModule,  
     MyGateWayModule,
     QrCodeModule,
     JwtModule.registerAsync({

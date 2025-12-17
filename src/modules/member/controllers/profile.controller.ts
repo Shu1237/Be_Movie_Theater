@@ -25,22 +25,22 @@ import { Role } from 'src/common/enums/roles.enum';
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) { }
 
-  @Get()
-  @ApiOperation({ summary: 'Get user profile' })
-  async getProfile(@Req() req) {
-    const user = req.user as JWTUserType;
-    return this.profileService.getProfile(user.account_id, user.role_id);
-  }
+  // @Get()
+  // @ApiOperation({ summary: 'Get user profile' })
+  // async getProfile(@Req() req) {
+  //   const user = req.user as JWTUserType;
+  //   return this.profileService.getProfile(user.account_id, user.role_id);
+  // }
 
-  @Put('me')
-  @ApiOperation({ summary: 'Update user profile' })
-  async updateProfile(
-    @Req() req,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    const user = req.user as JWTUserType;
-    return this.profileService.updateProfile(user.account_id, updateUserDto);
-  }
+  // @Put('me')
+  // @ApiOperation({ summary: 'Update user profile' })
+  // async updateProfile(
+  //   @Req() req,
+  //   @Body() updateUserDto: UpdateUserDto,
+  // ) {
+  //   const user = req.user as JWTUserType;
+  //   return this.profileService.updateProfile(user.account_id, updateUserDto);
+  // }
   @UseGuards( RolesGuard)
   @Roles(Role.ADMIN, Role.EMPLOYEE)
   @Post('qrcode')

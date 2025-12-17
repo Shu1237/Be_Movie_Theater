@@ -2,66 +2,54 @@ import {
   IsEmail,
   IsNotEmpty,
   IsString,
-  IsDateString,
   Length,
-  Matches,
   IsOptional,
   IsNumber,
   IsBoolean,
+  Min,
+  MinLength,
+  IsEnum,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
+import { Gender } from 'src/common/enums/gender.enum';
 
 export class CreateAccountDto {
-  @ApiProperty()
+
+  @ApiProperty({
+    example: 'abc',
+  })
   @IsString()
   @IsNotEmpty()
-  address: string;
+  username: string;
 
-  @ApiProperty()
-  @IsDateString()
-  @Transform(({ value }) => new Date(value).toISOString().split('T')[0]) 
-  @IsNotEmpty()
-  date_of_birth: Date;
+  @ApiProperty({
+    example: '12345678',
+    minLength: 8,
+  })
+  @IsString()
+  @IsNotEmpty({ message: 'Password must not be empty' })
+  @MinLength(8)
+  password: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: 'abc@gmail.com',
+  })
   @IsEmail()
   @IsNotEmpty()
   email: string;
 
-  @ApiProperty()
-  @IsBoolean()
-  @IsNotEmpty()
-  gender: boolean;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  @Length(9, 12)
-  identity_card: string;
+  @ApiPropertyOptional({
+    enum: Gender,
+    default: Gender.UNKNOWN,
+  })
+  @IsEnum(Gender)
+  @IsOptional()
+  gender?: Gender;
 
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
-  @IsNotEmpty()
-  image?: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  @Length(6, 32)
-  password: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  @Matches(/^\d{10,11}$/, { message: 'phone_number must be 10-11 digits' })
-  phone_number: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  username: string;
+  avatar?: string;
 
   @ApiPropertyOptional({
     default: 1,
@@ -71,9 +59,3 @@ export class CreateAccountDto {
   @IsNumber()
   role_id?: number;
 }
-//     @ApiPropertyOptional({ default: 1, description: '1: User, 2: Employee, 3: Admin' })
-//   @IsOptional()
-//   @Type(() => Number)
-//   @IsNumber()
-//   role_id?: number;
-// }

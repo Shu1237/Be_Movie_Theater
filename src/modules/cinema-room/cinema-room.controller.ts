@@ -28,15 +28,9 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 export class CinemaRoomController {
   constructor(private readonly cinemaRoomService: CinemaRoomService) { }
 
-  // GET - get list of cinema rooms for user
-  @Get('user')
-  @ApiOperation({ summary: 'Get all cinema rooms for users' })
-  async getAllCinemaRoomsUser() {
-    return await this.cinemaRoomService.getAllCinemaRoomsUser();
-  }
 
   // GET - get list of cinema rooms for admin (with pagination)
-  @Get('admin')
+  @Get()
   @ApiOperation({ summary: 'Get all cinema rooms for admin' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
@@ -55,7 +49,7 @@ export class CinemaRoomController {
   @Roles(Role.ADMIN, Role.EMPLOYEE)
   @UseGuards(RolesGuard)
   @ApiQuery({ name: 'is_deleted', required: false, type: Boolean, example: false })
-  async findAll(@Query() query: CinemaRoomPaginationDto, @Req() req) {
+  async findAll(@Query() query: CinemaRoomPaginationDto) {
     const { page = 1, take = 10, ...restFilters } = query;
     return this.cinemaRoomService.findAll({
       page,
@@ -76,7 +70,7 @@ export class CinemaRoomController {
   @Roles(Role.ADMIN, Role.EMPLOYEE)
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Create a new cinema room (admin, employee only)' })
-  async create(@Body() createCinemaRoomDto: CreateCinemaRoomDto, @Req() req) {
+  async create(@Body() createCinemaRoomDto: CreateCinemaRoomDto) {
     return await this.cinemaRoomService.create(createCinemaRoomDto);
   }
 

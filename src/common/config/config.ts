@@ -47,8 +47,7 @@ export default () => ({
     partnerCode: process.env.MOMO_PARTNER_CODE,
     queryUrl: process.env.MOMO_QUERY_URL,
   },
-
-  paypal: {
+   paypal: {
     clientId: process.env.PAYPAL_CLIENT_ID,
     clientSecret: process.env.PAYPAL_CLIENT_SECRET,
     baseUrl: process.env.PAYPAL_BASE_URL,
@@ -63,7 +62,7 @@ export default () => ({
     successUrl: process.env.VISA_SUCCESS_URL,
     cancelUrl: process.env.VISA_CANCEL_URL,
   },
-
+  
   vnpay: {
     tmnCode: process.env.VNP_TMN_CODE,
     hashSecret: process.env.VNP_HASH_SECRET,
@@ -81,13 +80,11 @@ export default () => ({
   },
 
   redis: {
-    url: process.env.REDIS_PUBLIC_URL,
+    url: process.env.REDIS_URL,
   },
-
-  aws: {
-    accessKey: process.env.S3_ACCESS_KEY,
-    secretKey: process.env.S3_SECRET_KEY,
-    region: process.env.S3_REGION,
-    bucketName: process.env.S3_BUCKET_NAME,
+  image_kit: {
+    publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
+    privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
+    urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT,
   },
 });

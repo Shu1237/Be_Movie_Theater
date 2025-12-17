@@ -146,7 +146,7 @@ export class TicketService {
     });
   }
 
-  async getTicketById(id: string) : Promise<ReturnType<typeof this.summaryTicket>> {
+  async getTicketById(id: number) : Promise<ReturnType<typeof this.summaryTicket>> {
     const ticket = await this.ticketRepository.findOne({
       where: { id },
       relations: [
@@ -222,7 +222,7 @@ export class TicketService {
     });
   }
 
-  async markTicketsAsUsed(ticketIds: string[]) : Promise<void> {
+  async markTicketsAsUsed(ticketIds: number[]) : Promise<void> {
     const tickets = await this.ticketRepository.find({
       where: { id: In(ticketIds), is_used: false },
     });

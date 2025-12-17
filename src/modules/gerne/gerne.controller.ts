@@ -28,17 +28,12 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 export class GerneController {
   constructor(private readonly gerneService: GerneService) { }
 
-  // GET - get all genres for users
-  @Get('user')
-  @ApiOperation({ summary: 'Get all genres for users' })
-  async getAllGernesUser(): Promise<Gerne[]> {
-    return await this.gerneService.getAllGernesUser();
-  }
+
 
   // GET - Get list of genres for admin (with pagination)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.EMPLOYEE)
-  @Get('admin')
+  @Get()
   @ApiOperation({ summary: 'Get all genres for admin' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
@@ -74,17 +69,8 @@ export class GerneController {
   // GET - Get genre by ID
   @Get(':id')
   @ApiOperation({ summary: 'Get genre by ID' })
-  async findGerneById(@Param('id', ParseIntPipe) id: number): Promise<Gerne> {
+  async findGerneById(@Param('id', ParseIntPipe) id: number) {
     return await this.gerneService.findGerneById(id);
-  }
-
-  // GET - Get all movies of a genre
-  @Get(':gerneId/movies')
-  @ApiOperation({ summary: 'Get all movies of a genre' })
-  async getMoviesOfGerne(
-    @Param('gerneId', ParseIntPipe) gerneId: number,
-  ): Promise<Movie[]> {
-    return await this.gerneService.getMoviesOfGerne(gerneId);
   }
 
   // POST - Create a new genre
@@ -138,7 +124,7 @@ export class GerneController {
   @ApiBearerAuth()
   async deleteGerne(
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<void> {
+  ) {
     return await this.gerneService.deleteGerne(id);
   }
 }

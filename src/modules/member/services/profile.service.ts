@@ -76,6 +76,8 @@ export class ProfileService {
       account_id: user.id,
       role_id: user.role.role_id,
       username: user.username,
+      email: user.email,
+      provider: user.provider,
     };
     return payload;
   }

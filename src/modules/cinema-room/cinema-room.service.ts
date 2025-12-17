@@ -12,6 +12,9 @@ import { cinemaRoomFieldMapping } from 'src/common/pagination/fillters/cinmeroom
 import { applySorting } from 'src/common/pagination/apply_sort';
 import { applyPagination } from 'src/common/pagination/applyPagination';
 import { buildPaginationResponse } from 'src/common/pagination/pagination-response';
+import { ResponseDetail } from 'src/common/response/response-detail-create-update';
+import { ResponseList } from 'src/common/response/response-list';
+import { ResponseMsg } from 'src/common/response/response-message';
 
 
 @Injectable()
@@ -33,7 +36,7 @@ export class CinemaRoomService {
 
   async create(
     createCinemaRoomDto: CreateCinemaRoomDto,
-  ): Promise<{ message: string }> {
+  ): Promise<ResponseDetail<CinemaRoom>> {
     if (!createCinemaRoomDto) {
       throw new BadRequestException('Create cinema room DTO is required');
     }
@@ -55,12 +58,10 @@ export class CinemaRoomService {
       cinema_room_name: trimmedName,
     });
     await this.cinemaRoomRepository.save(cinemaRoom);
-    return {
-      message: 'Cinema room created successfully',
-    };
+    return ResponseDetail.ok(cinemaRoom);
   }
 
-  async findAll(filters: CinemaRoomPaginationDto): Promise<ReturnType<typeof buildPaginationResponse>> {
+  async findAll(filters: CinemaRoomPaginationDto): Promise<ResponseList<CinemaRoom>> {
     if (!filters) {
       throw new BadRequestException('Filters are required');
     }
@@ -91,16 +92,10 @@ export class CinemaRoomService {
 
     const activeCount = Number(countResult?.activeCount) || 0;
     const deletedCount = Number(countResult?.deletedCount) || 0;
-    return buildPaginationResponse(cinemaRooms, {
-      total,
-      page: filters.page,
-      take: filters.take,
-      activeCount,
-      deletedCount,
-    });
+    return ResponseList.ok(buildPaginationResponse(cinemaRooms, {total, page: filters.page, take: filters.take, activeCount, deletedCount}));
   }
 
-  async findOne(id: number): Promise<CinemaRoom> {
+  async findOne(id: number): Promise<ResponseDetail<CinemaRoom>> {
     if (
       id === null ||
       id === undefined ||
@@ -116,13 +111,13 @@ export class CinemaRoomService {
     if (!cinemaRoom) {
       throw new NotFoundException(`Cinema room with ID ${id} not found`);
     }
-    return cinemaRoom;
+    return ResponseDetail.ok(cinemaRoom);
   }
 
   async update(
     id: number,
     updateCinemaRoomDto: UpdateCinemaRoomDto,
-  ): Promise<{ message: string }> {
+  ): Promise<ResponseDetail<CinemaRoom | null>> {
     if (!updateCinemaRoomDto) {
       throw new BadRequestException('Update cinema room DTO is required');
     }
@@ -143,16 +138,14 @@ export class CinemaRoomService {
     if (!cinemaRoom) {
       throw new NotFoundException(`Cinema room with ID ${id} not found`);
     }
-    await this.cinemaRoomRepository.update(id, {
+   const updateCinemaRoom = await this.cinemaRoomRepository.update(id, {
       ...updateCinemaRoomDto,
       cinema_room_name: trimmedName,
     });
-    return {
-      message: 'Cinema room updated successfully',
-    };
+    return ResponseDetail.ok(updateCinemaRoom.raw[0]);
   }
 
-  async remove(id: number): Promise<{ msg: string }> {
+  async remove(id: number): Promise<ResponseMsg> {
     if (
       id === null ||
       id === undefined ||
@@ -178,12 +171,12 @@ export class CinemaRoomService {
     }
 
     await this.cinemaRoomRepository.remove(cinemaRoom);
-    return { msg: 'Cinema room deleted successfully' };
+    return ResponseMsg.ok('Cinema Room removed successfully');
   }
 
   async softDeleteCinemaRoom(
     id: number,
-  ) : Promise<{ msg: string}>{
+  ) : Promise<ResponseMsg>{
     if (
       id === null ||
       id === undefined ||
@@ -211,12 +204,12 @@ export class CinemaRoomService {
     cinemaRoom.is_deleted = true;
     await this.cinemaRoomRepository.save(cinemaRoom);
 
-    return  { msg: 'Cinema Room soft-deleted successfully' };
+    return ResponseMsg.ok('Cinema Room soft-deleted successfully');
   }
 
   async restoreCinemaRoom(
     id: number,
-  ): Promise<{ msg: string; cinemaRoom: CinemaRoom }> {
+  ): Promise<ResponseMsg> {
     if (
       id === null ||
       id === undefined ||
@@ -239,6 +232,6 @@ export class CinemaRoomService {
     }
     cinemaRoom.is_deleted = false;
     await this.cinemaRoomRepository.save(cinemaRoom);
-    return { msg: 'Cinema Room restored successfully', cinemaRoom };
+    return ResponseMsg.ok('Cinema Room restored successfully');
   }
 }

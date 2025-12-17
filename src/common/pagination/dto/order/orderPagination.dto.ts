@@ -1,7 +1,6 @@
 import { IsOptional, IsString, IsIn } from 'class-validator';
-import {
+import  {
   StatusOrderWithAll,
-  StatusOrderWithAllType,
 } from 'src/common/enums/status-order.enum';
 import { BasePaginationDto } from '../basePagination.dto';
 
@@ -18,7 +17,7 @@ export class OrderPaginationDto extends BasePaginationDto {
   @IsIn(StatusOrderWithAll, {
     message: `status must be one of: ${StatusOrderWithAll.join(', ')}`,
   })
-  status?: StatusOrderWithAllType;
+  status?: string;
 
   @IsOptional()
   @IsString()

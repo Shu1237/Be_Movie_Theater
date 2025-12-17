@@ -6,6 +6,8 @@ import { applyPagination } from 'src/common/pagination/applyPagination';
 import { HistoryScorePaginationDto } from 'src/common/pagination/dto/historyScore/historyScorePagination.dto';
 import { historyScoreFieldMapping } from 'src/common/pagination/fillters/historyScore-filed-mapping';
 import { buildPaginationResponse } from 'src/common/pagination/pagination-response';
+import { ResponseDetail } from 'src/common/response/response-detail-create-update';
+import { ResponseList } from 'src/common/response/response-list';
 import { JWTUserType } from 'src/common/utils/type';
 import { HistoryScore } from 'src/database/entities/order/history_score';
 import { Repository } from 'typeorm/repository/Repository';
@@ -54,7 +56,7 @@ export class HistoryScoreService {
 
   async getHistoryScoreByUserId(
     filters: HistoryScorePaginationDto & { userId: string },
-  ): Promise<ReturnType<typeof buildPaginationResponse>> {
+  ): Promise<ResponseList<HistoryScore>> {
     const qb = this.historyScoreRepository
       .createQueryBuilder('history_score')
       .leftJoinAndSelect('history_score.user', 'user')
@@ -84,14 +86,14 @@ export class HistoryScoreService {
     });
     const [historyScores, total] = await qb.getManyAndCount();
 
-    return buildPaginationResponse(historyScores, {
+    return ResponseList.ok(buildPaginationResponse(historyScores, {
       total,
       page: filters.page,
       take: filters.take,
-    });
+    }));
   }
 
-  async getHistoryScoreById(id: number): Promise<HistoryScore> {
+  async getHistoryScoreById(id: number): Promise<ResponseDetail<HistoryScore>> {
     const historyScore = await this.historyScoreRepository.findOne({
       where: { id },
       relations: ['user', 'order', 'order.promotion'],
@@ -99,6 +101,6 @@ export class HistoryScoreService {
     if (!historyScore) {
       throw new Error(`History score with ID ${id} not found`);
     }
-    return historyScore;
+    return ResponseDetail.ok(historyScore);
   }
 }

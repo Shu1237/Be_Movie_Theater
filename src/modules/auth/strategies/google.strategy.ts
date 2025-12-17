@@ -5,6 +5,7 @@ import { AuthService } from '../auth.service';
 import { GoogleUserType } from 'src/common/utils/type';
 import { ConfigService } from '@nestjs/config';
 import { InternalServerErrorException } from 'src/common/exceptions/internal-server-error.exception';
+import { Gender } from 'src/common/enums/gender.enum';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -41,12 +42,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     profile: any,
     done: VerifyCallback,
   ) {
-    // const user = await this.authService.validateGoogleUser({
-    //   email: profile.emails[0].value,
-    //   avatarUrl: profile.photos[0].value,
-    //   password: '',
-    // });
-    // // done(null, user);
-    // return user;
+   const user = {
+    email: profile.emails[0].value,
+    gender:Gender.UNKNOWN,
+    avatar: profile.photos[0]?.value || null,
+   }
+    done(null, user);
+    return user;
   }
 }

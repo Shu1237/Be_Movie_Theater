@@ -31,15 +31,10 @@ import { Role } from 'src/common/enums/roles.enum';
 export class ActorController {
   constructor(private readonly actorService: ActorService) { }
 
-  // GET - get list of actors for user
-  @Get('user')
-  @ApiOperation({ summary: 'Get all actors for users' })
-  async getAllActorsUser() {
-    return await this.actorService.getAllActorsUser();
-  }
 
-  // GET - get list of actors for admin (with pagination and filter)
-  @Get('admin')
+
+  // GET - get list of actors 
+  @Get()
   @ApiOperation({ summary: 'Get all actors for admin' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
@@ -97,7 +92,7 @@ export class ActorController {
     type: Boolean,
     example: false,
   })
-  async getAllActors(@Query() query: ActorPaginationDto, @Req() req) {
+  async getAllActors(@Query() query: ActorPaginationDto) {
     const { page = 1, take = 10, ...restFilters } = query;
     return await this.actorService.getAllActors({
       page,

@@ -14,8 +14,8 @@ import { TicketType } from './ticket-type';
 
 @Entity('ticket')
 export class Ticket {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+   @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ default: false })
   status: boolean;

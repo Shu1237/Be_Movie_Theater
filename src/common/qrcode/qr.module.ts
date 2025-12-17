@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { QrCodeService } from './qrcode.service';
-import { S3Module } from 'src/common/s3/s3.module';
+import { ImagekitModule } from '../imagekit/imagekit.module';
 
 @Module({
-  imports: [S3Module],
+  imports: [ImagekitModule],
   providers: [QrCodeService],
   exports: [QrCodeService],
 })

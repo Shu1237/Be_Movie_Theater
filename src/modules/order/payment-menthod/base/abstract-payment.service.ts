@@ -1,11 +1,14 @@
-import { MailerService } from "@nestjs-modules/mailer";
+
+
 import { NotFoundException } from "@nestjs/common/exceptions/not-found.exception";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
+import { InjectRepository } from "@nestjs/typeorm";
 import { Role } from "src/common/enums/roles.enum";
 import { StatusOrder } from "src/common/enums/status-order.enum";
 import { StatusSeat } from "src/common/enums/status_seat.enum";
 import { MyGateWay } from "src/common/gateways/seat.gateway";
+import { MailService } from "src/common/mail/mail.service";
 import { QrCodeService } from "src/common/qrcode/qrcode.service";
 import { ScheduleSeat } from "src/database/entities/cinema/schedule_seat";
 import { HistoryScore } from "src/database/entities/order/history_score";
@@ -21,14 +24,14 @@ import { In, Repository } from "typeorm";
 export abstract class AbstractPaymentService {
 
     constructor(
-        protected readonly transactionRepository: Repository<Transaction>,
-        protected readonly orderRepository: Repository<Order>,
-        protected readonly ticketRepository: Repository<Ticket>,
-        protected readonly scheduleSeatRepository: Repository<ScheduleSeat>,
-        protected readonly historyScoreRepository: Repository<HistoryScore>,
-        protected readonly userRepository: Repository<User>,
-        protected readonly orderExtraRepository: Repository<OrderExtra>,
-        protected readonly mailerService: MailerService,
+        @InjectRepository(Transaction)  protected readonly transactionRepository: Repository<Transaction>,
+        @InjectRepository(Order) protected readonly orderRepository: Repository<Order>,
+        @InjectRepository(Ticket) protected readonly ticketRepository: Repository<Ticket>,
+        @InjectRepository(ScheduleSeat) protected readonly scheduleSeatRepository: Repository<ScheduleSeat>,
+        @InjectRepository(HistoryScore) protected readonly historyScoreRepository: Repository<HistoryScore>,
+        @InjectRepository(User) protected readonly userRepository: Repository<User>,
+        @InjectRepository(OrderExtra) protected readonly orderExtraRepository: Repository<OrderExtra>,
+        protected readonly mailerService: MailService,
         protected readonly gateway: MyGateWay,
         protected readonly qrCodeService: QrCodeService,
         protected readonly configService: ConfigService,
@@ -125,8 +128,8 @@ export abstract class AbstractPaymentService {
             }
         );
 
-        const qrCode = await this.qrCodeService.generateQrCode(jwtOrderID, 'QR');
-        order.qr_code = qrCode;
+        const qrCode = await this.qrCodeService.generateQrCode(jwtOrderID);
+        order.qr_code = qrCode.data?.url || '';
         const savedOrder = await this.orderRepository.save(order);
 
         let scoreTargetUser: User | null = null;
@@ -185,7 +188,7 @@ export abstract class AbstractPaymentService {
                 throw new NotFoundException('User not found');
             }
             if (user.role.role_id === Role.USER) {
-                await this.sendOrderConfirmationEmail(order, transaction);
+                // await this.sendOrderConfirmationEmail(order, transaction);
             }
         } catch (error) {
             // console.error('Mailer error:', error);
@@ -228,37 +231,37 @@ export abstract class AbstractPaymentService {
         return `${this.configService.get<string>('redirectFE.url')}?status=failure `;
     }
 
-    async sendOrderConfirmationEmail(order: Order, transaction: Transaction) {
-        const firstTicket = order.orderDetails[0]?.ticket;
-        await this.mailerService.sendMail({
-            to: order.user.email,
-            subject: 'Your Order Successful',
-            template: 'order-confirmation',
-            context: {
-                user: order.user.username,
-                transactionCode: transaction.transaction_code,
-                order_date: order.order_date,
-                total: Number(order.total_prices).toLocaleString('vi-VN'),
-                paymentMethod: transaction.paymentMethod.name,
-                year: new Date().getFullYear(),
-                movieName: firstTicket?.schedule.movie.name,
-                roomName: firstTicket?.schedule.cinemaRoom.cinema_room_name,
-                start_movie_time: firstTicket?.schedule.start_movie_time ?? '',
-                end_movie_time: firstTicket?.schedule.end_movie_time ?? '',
-                seats: order.orderDetails.map(detail => ({
-                    row: detail.ticket.seat.seat_row,
-                    column: detail.ticket.seat.seat_column,
-                    ticketType: detail.ticket.ticketType.ticket_name,
-                    price: Number(detail.total_each_ticket).toLocaleString('vi-VN'),
-                })),
-                orderExtras: order.orderExtras?.map(extra => ({
-                    name: extra.product.name,
-                    quantity: extra.quantity,
-                    price: Number(extra.unit_price).toLocaleString('vi-VN'),
-                    total: (extra.quantity * Number(extra.unit_price)).toLocaleString('vi-VN'),
-                })) || [],
-            },
-        });
-    }
+    // async sendOrderConfirmationEmail(order: Order, transaction: Transaction) {
+    //     const firstTicket = order.orderDetails[0]?.ticket;
+    //     await this.mailerService.sendMail({
+    //         to: order.user.email,
+    //         subject: 'Your Order Successful',
+    //         template: 'order-confirmation',
+    //         context: {
+    //             user: order.user.username,
+    //             transactionCode: transaction.transaction_code,
+    //             order_date: order.order_date,
+    //             total: Number(order.total_prices).toLocaleString('vi-VN'),
+    //             paymentMethod: transaction.paymentMethod.name,
+    //             year: new Date().getFullYear(),
+    //             movieName: firstTicket?.schedule.movie.name,
+    //             roomName: firstTicket?.schedule.cinemaRoom.cinema_room_name,
+    //             start_movie_time: firstTicket?.schedule.start_movie_time ?? '',
+    //             end_movie_time: firstTicket?.schedule.end_movie_time ?? '',
+    //             seats: order.orderDetails.map(detail => ({
+    //                 row: detail.ticket.seat.seat_row,
+    //                 column: detail.ticket.seat.seat_column,
+    //                 ticketType: detail.ticket.ticketType.ticket_name,
+    //                 price: Number(detail.total_each_ticket).toLocaleString('vi-VN'),
+    //             })),
+    //             orderExtras: order.orderExtras?.map(extra => ({
+    //                 name: extra.product.name,
+    //                 quantity: extra.quantity,
+    //                 price: Number(extra.unit_price).toLocaleString('vi-VN'),
+    //                 total: (extra.quantity * Number(extra.unit_price)).toLocaleString('vi-VN'),
+    //             })) || [],
+    //         },
+    //     });
+    // }
 
 }

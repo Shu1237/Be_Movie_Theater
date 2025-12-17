@@ -17,6 +17,9 @@ import { movieFieldMapping } from 'src/common/pagination/fillters/movieFieldMapp
 import { applySorting } from 'src/common/pagination/apply_sort';
 import { applyPagination } from 'src/common/pagination/applyPagination';
 import { buildPaginationResponse } from 'src/common/pagination/pagination-response';
+import { ResponseList } from 'src/common/response/response-list';
+import { ResponseDetail } from 'src/common/response/response-detail-create-update';
+import { ResponseMsg } from 'src/common/response/response-message';
 
 @ApiTags('Movies')
 @Injectable()
@@ -69,7 +72,7 @@ export class MovieService {
     return movies.map((movie) => this.getMovieSummary(movie));
   }
   
-  async getAllMovies(fillters: MoviePaginationDto) : Promise<ReturnType<typeof buildPaginationResponse>> {
+  async getAllMovies(fillters: MoviePaginationDto) : Promise<ResponseList<IMovie>> {
     const qb = this.movieRepository
       .createQueryBuilder('movie')
       .leftJoinAndSelect('movie.actors', 'actor')
@@ -107,16 +110,10 @@ export class MovieService {
         `SUM(CASE WHEN movie.is_deleted = true THEN 1 ELSE 0 END) AS deletedCount`,
       ])
       .getRawOne() || { activeCount: 0, deletedCount: 0 };
-
+      
     const activeCount = Number(counts.activeCount) || 0;
     const deletedCount = Number(counts.deletedCount) || 0;
-    return buildPaginationResponse(summaries, {
-      total,
-      page: fillters.page,
-      take: fillters.take,
-      activeCount,
-      deletedCount,
-    });
+    return ResponseList.ok(buildPaginationResponse(summaries,{ total, page: fillters.page, take: fillters.take,activeCount, deletedCount }))
   }
 
   async getMovieById(id: number): Promise<IMovie> {
@@ -131,7 +128,7 @@ export class MovieService {
     return this.getMovieSummary(movie);
   }
 
-  async createMovie(movieDto: CreateMovieDto): Promise<{ msg: string }> {
+  async createMovie(movieDto: CreateMovieDto): Promise<ResponseDetail<Movie>> {
     try {
       const existingMovie = await this.movieRepository.findOne({
         where: { name: movieDto.name },
@@ -186,9 +183,7 @@ export class MovieService {
       }
 
       await this.movieRepository.save(movie);
-      return {
-        msg: 'Movie created successfully',
-      };
+      return ResponseDetail.ok(movie);
     } catch (error) {
 
       if (
@@ -207,7 +202,7 @@ export class MovieService {
   async updateMovie(
     id: number,
     movieDto: UpdateMovieDto,
-  ): Promise<{ msg: string }> {
+  ): Promise<ResponseDetail<Movie | null>> {
     const existingMovie = await this.movieRepository.findOne({
       where: { id },
       relations: ['gernes', 'actors', 'versions'],
@@ -256,17 +251,15 @@ export class MovieService {
     }
 
     await this.movieRepository.save(existingMovie);
-    return {
-      msg: 'Movie updated successfully',
-    };
+    return ResponseDetail.ok(existingMovie);
   }
 
-  async deleteMovie(id: number) : Promise<{ msg: string }> {
+  async deleteMovie(id: number) : Promise<ResponseMsg> {
     const result = await this.movieRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`Movie with ID ${id} not found`);
     }
-    return { msg: 'Movie deleted successfully' };
+    return ResponseMsg.ok('Movie deleted successfully');
   }
 
   async softDeleteMovie(id: number) {
@@ -276,7 +269,7 @@ export class MovieService {
     return { msg: 'Movie soft-deleted successfully', movie };
   }
 
-  async restoreMovie(id: number) {
+  async restoreMovie(id: number)  : Promise<ResponseMsg> {
     const movie = await this.movieRepository.findOne({ where: { id } });
     if (!movie) {
       throw new NotFoundException(`Movie with ID ${id} not found`);
@@ -286,7 +279,7 @@ export class MovieService {
     }
     movie.is_deleted = false;
     await this.movieRepository.save(movie);
-    return { msg: 'Movie restored successfully', movie };
+    return ResponseMsg.ok('Movie restored successfully');
   }
 
   async getActorsOfMovie(
