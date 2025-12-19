@@ -1,18 +1,18 @@
 import { Module } from '@nestjs/common';
 import { MomoService } from './momo.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Transaction } from 'src/database/entities/order/transaction';
-import { Order } from 'src/database/entities/order/order';
-import { Ticket } from 'src/database/entities/order/ticket';
-import { User } from 'src/database/entities/user/user';
-import { MailModule } from "src/common/mail/mail.module";
-import { ScheduleSeat } from 'src/database/entities/cinema/schedule_seat';
-import { HistoryScore } from 'src/database/entities/order/history_score';
-import { OrderExtra } from 'src/database/entities/order/order-extra';
-import { MyGateWayModule } from 'src/common/gateways/seat.gateway.module';
-import { QrCodeModule } from 'src/common/qrcode/qr.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { Transaction } from '@database/entities/order/transaction';
+import { MyGateWayModule } from '@common/gateways/seat.gateway.module';
+import { MailModule } from '@common/mail/mail.module';
+import { QrCodeModule } from '@common/qrcode/qr.module';
+import { ScheduleSeat } from '@database/entities/cinema/schedule_seat';
+import { HistoryScore } from '@database/entities/order/history_score';
+import { Order } from '@database/entities/order/order';
+import { OrderExtra } from '@database/entities/order/order-extra';
+import { Ticket } from '@database/entities/order/ticket';
+import { User } from '@database/entities/user/user';
 
 @Module({
   imports: [
@@ -26,7 +26,6 @@ import { ConfigService } from '@nestjs/config';
       User,
     ]),
     MailModule,
-   
     MyGateWayModule,
     QrCodeModule,
     JwtModule.registerAsync({

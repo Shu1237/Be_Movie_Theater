@@ -15,11 +15,12 @@ import { ScheduleService } from './schedule.service';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
-import { SchedulePaginationDto } from 'src/common/pagination/dto/shedule/schedulePagination.dto';
-import { Roles } from 'src/common/decorator/roles.decorator';
-import { Role } from 'src/common/enums/roles.enum';
-import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from '@common/decorator/roles.decorator';
+import { Role } from '@common/enums/roles.enum';
+import { JwtAuthGuard } from '@common/guards/jwt.guard';
+import { RolesGuard } from '@common/guards/roles.guard';
+import { SchedulePaginationDto } from '@common/pagination/dto/shedule/schedulePagination.dto';
+
 
 @Controller('schedules')
 @UseGuards(JwtAuthGuard)

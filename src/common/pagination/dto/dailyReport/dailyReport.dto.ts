@@ -1,8 +1,17 @@
 import { Type } from 'class-transformer';
-import { IsDate, IsOptional, IsInt, Min, Max, IsNumber } from 'class-validator';
+import { IsDate, IsOptional, IsInt, Min, Max, IsNumber, IsString } from 'class-validator';
 import { BasePaginationDto } from '../basePagination.dto';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class DailyReportDto extends BasePaginationDto {
+  @ApiPropertyOptional({
+    description: 'Field to sort by',
+    example: 'paymentMethod.id | dailyReport.reportDate | dailyReport.totalAmount | dailyReport.totalOrders| dailyReport.totalFailed ',
+  })
+  @IsOptional()
+  @IsString()
+  sortBy?: string;
+
   @IsOptional()
   @IsInt()
   @Min(1)

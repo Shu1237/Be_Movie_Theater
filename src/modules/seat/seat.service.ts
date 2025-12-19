@@ -1,24 +1,22 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Seat } from 'src/database/entities/cinema/seat';
-import { HoldSeatType, JWTUserType } from 'src/common/utils/type';
 import { In, Repository } from 'typeorm';
-import { SeatType } from 'src/database/entities/cinema/seat-type';
-import { CinemaRoom } from 'src/database/entities/cinema/cinema-room';
-import { ScheduleSeat } from 'src/database/entities/cinema/schedule_seat';
-import { StatusSeat } from 'src/common/enums/status_seat.enum';
 import Redis from 'ioredis/built/Redis';
-import { NotFoundException } from 'src/common/exceptions/not-found.exception';
-import { BadRequestException } from 'src/common/exceptions/bad-request.exception';
-import { BulkCreateSeatDto } from './dto/BulkCreateSeatDto';
-import { SeatPaginationDto } from 'src/common/pagination/dto/seat/seatPagination.dto';
-import { applyCommonFilters } from 'src/common/pagination/applyCommonFilters';
-import { seatFieldMapping } from 'src/common/pagination/fillters/seat-filed-mapping';
-import { applySorting } from 'src/common/pagination/apply_sort';
-import { applyPagination } from 'src/common/pagination/applyPagination';
-import { buildPaginationResponse } from 'src/common/pagination/pagination-response';
 import { BulkSeatOperationDto } from './dto/BulkSeatOperationDto';
 import { BulkSeatIdsDto } from './dto/BulkSeatIdsDto';
+import { StatusSeat } from '@common/enums/status_seat.enum';
+import { applySorting } from '@common/pagination/apply_sort';
+import { applyCommonFilters } from '@common/pagination/applyCommonFilters';
+import { applyPagination } from '@common/pagination/applyPagination';
+import { SeatPaginationDto } from '@common/pagination/dto/seat/seatPagination.dto';
+import { seatFieldMapping } from '@common/pagination/fillters/seat-filed-mapping';
+import { buildPaginationResponse } from '@common/pagination/pagination-response';
+import { HoldSeatType, JWTUserType } from '@common/utils/type';
+import { CinemaRoom } from '@database/entities/cinema/cinema-room';
+import { ScheduleSeat } from '@database/entities/cinema/schedule_seat';
+import { Seat } from '@database/entities/cinema/seat';
+import { SeatType } from '@database/entities/cinema/seat-type';
+import { BulkCreateSeatDto } from './dto/BulkCreateSeatDto';
 
 @Injectable()
 export class SeatService {
@@ -69,7 +67,6 @@ export class SeatService {
       'seat.seat_column',
       'seatType.seat_type_name',
       'cinemaRoom.cinema_room_name',
-      'cinemaRoom.id',
     ];
     applySorting(
       qb,

@@ -11,17 +11,16 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
+import { ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { GerneService } from './gerne.service';
-import { Gerne } from 'src/database/entities/cinema/gerne';
+import { Roles } from '@common/decorator/roles.decorator';
+import { Role } from '@common/enums/roles.enum';
+import { JwtAuthGuard } from '@common/guards/jwt.guard';
+import { RolesGuard } from '@common/guards/roles.guard';
+import { GernePaginationDto } from '@common/pagination/dto/gerne/gerne.dto';
 import { CreateGerneDto } from './dtos/createGerne';
 import { UpdateGerneDto } from './dtos/updateGerne';
-import { ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
-import { Movie } from 'src/database/entities/cinema/movie';
-import { GernePaginationDto } from 'src/common/pagination/dto/gerne/gerne.dto';
-import { Roles } from 'src/common/decorator/roles.decorator';
-import { Role } from 'src/common/enums/roles.enum';
-import { RolesGuard } from 'src/common/guards/roles.guard';
+
 
 
 @Controller('gernes')
@@ -34,27 +33,9 @@ export class GerneController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.EMPLOYEE)
   @Get()
-  @ApiOperation({ summary: 'Get all genres for admin' })
+  @ApiOperation({ summary: 'Get all genres (admin, employee only)' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
-  @ApiQuery({
-    name: 'search',
-    required: false,
-    type: String,
-    example: 'Action',
-  })
-  @ApiQuery({
-    name: 'sortOrder',
-    required: false,
-    enum: ['ASC', 'DESC'],
-    example: 'ASC',
-  })
-  @ApiQuery({
-    name: 'is_deleted',
-    required: false,
-    type: Boolean,
-    example: false,
-  })
   @ApiBearerAuth()
   async findAllGernes(@Query() query: GernePaginationDto) {
     const { page = 1, take = 10, ...restFilters } = query;

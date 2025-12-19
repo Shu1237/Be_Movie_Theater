@@ -1,6 +1,7 @@
 import { IsString,  IsNumber,  IsEnum, IsNotEmpty,  Min, Max, ValidateIf } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ProductTypeEnum } from 'src/common/enums/product.enum';
+import { ProductTypeEnum } from '@common/enums/product.enum';
+
 
 export class CreateProductDto {
   @IsNotEmpty({ message: 'The name must not be empty' })

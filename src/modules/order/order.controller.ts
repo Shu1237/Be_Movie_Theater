@@ -1,23 +1,21 @@
-import { Controller, Get, Post, Body, Query, Res, UseGuards, Req, Param, ParseIntPipe, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Res, UseGuards, Request, Param, ParseIntPipe, Patch, InternalServerErrorException } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { MomoService } from './payment-menthod/momo/momo.service';
 import { PayPalService } from './payment-menthod/paypal/paypal.service';
-import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
 import { CreateOrderBillDto } from './dto/order-bill.dto';
-import { ApiOperation, ApiBody, ApiResponse, ApiBearerAuth, ApiExcludeEndpoint, ApiQuery } from '@nestjs/swagger';
+import { ApiOperation, ApiBody, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { VnpayService } from './payment-menthod/vnpay/vnpay.service';
 import { ZalopayService } from './payment-menthod/zalopay/zalopay.service';
-import { JWTUserType } from 'src/common/utils/type';
-import { ScanQrCodeDto } from './dto/qrcode.dto';
-import { InternalServerErrorException } from 'src/common/exceptions/internal-server-error.exception';
-import { BadRequestException } from 'src/common/exceptions/bad-request.exception';
-import { StatusOrder } from 'src/common/enums/status-order.enum';
-import { OrderPaginationDto } from 'src/common/pagination/dto/order/orderPagination.dto';
 import { VisaService } from './payment-menthod/visa/visa.service';
 import { ConfigService } from '@nestjs/config';
-import { Roles } from 'src/common/decorator/roles.decorator';
-import { Role } from 'src/common/enums/roles.enum';
-import { RolesGuard } from 'src/common/guards/roles.guard';
+import { ScanQrCodeDto } from './dto/qrcode.dto';
+import { Roles } from '@common/decorator/roles.decorator';
+import { Role } from '@common/enums/roles.enum';
+import { StatusOrder } from '@common/enums/status-order.enum';
+import { JwtAuthGuard } from '@common/guards/jwt.guard';
+import { RolesGuard } from '@common/guards/roles.guard';
+import { OrderPaginationDto } from '@common/pagination/dto/order/orderPagination.dto';
+import { JWTUserType } from '@common/utils/type';
 
 @ApiBearerAuth()
 @Controller('order')
@@ -36,18 +34,18 @@ export class OrderController {
 
 
   // POST /order - Create new order
-  // @UseGuards(JwtAuthGuard)
-  // @Post()
-  // @ApiOperation({ summary: 'Create a new order' })
-  // @ApiBearerAuth()
-  // @ApiBody({ type: CreateOrderBillDto })
-  // createOrder(@Body() body: CreateOrderBillDto, @Req() req) {
-  //   const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-  //   if (!clientIp) {
-  //     throw new InternalServerErrorException('Client IP address not found');
-  //   }
-  //   return this.orderService.createOrder(req.user, body, clientIp);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  @ApiOperation({ summary: 'Create a new order' })
+  @ApiBearerAuth()
+  @ApiBody({ type: CreateOrderBillDto })
+  createOrder(@Body() body: CreateOrderBillDto, @Request() req :{user: JWTUserType, headers: any, socket: any}) {
+    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    if (!clientIp) {
+      throw new InternalServerErrorException('Client IP address not found');
+    }
+    return this.orderService.createOrder(req.user, body, clientIp);
+  }
 
   // POST /order/scan-qr - Scan QR code
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -131,24 +129,6 @@ export class OrderController {
   @ApiOperation({ summary: 'View all orders for admin' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
-  @ApiQuery({ name: 'status', required: false, enum: ['all', ...Object.values(StatusOrder)], example: 'all', description: 'Trạng thái đơn hàng', })
-  @ApiQuery({ name: 'search', required: false, type: String, example: '' })
-  @ApiQuery({ name: 'userId', required: false, type: String, example: 'uuid' })
-  @ApiQuery({ name: 'startDate', required: false, type: String, example: '2025-07-01' })
-  @ApiQuery({ name: 'endDate', required: false, type: String, example: '2025-07-03' })
-  @ApiQuery({
-    name: 'sortBy',
-    required: false,
-    type: String,
-    example: 'order.order_date | user.username | movie.name',
-  })
-  @ApiQuery({
-    name: 'sortOrder',
-    required: false,
-    enum: ['ASC', 'DESC'],
-    example: 'DESC',
-  })
-  @ApiQuery({ name: 'paymentMethod', required: false, type: String, example: 'momo' })
   @ApiResponse({ status: 200, description: 'List of all orders' })
   async getAllOrders(
 

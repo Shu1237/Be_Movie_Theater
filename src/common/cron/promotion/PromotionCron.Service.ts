@@ -1,8 +1,9 @@
+import { Promotion } from '@database/entities/promotion/promotion';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Promotion } from 'src/database/entities/promotion/promotion';
+
 
 @Injectable()
 export class PromotionCronService {

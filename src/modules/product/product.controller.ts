@@ -12,14 +12,14 @@ import {
   Patch,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
 import { ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { CreateProductDto } from './dto/createProdcut.dto';
 import { UpdateProductDto } from './dto/updateProduct.dto';
-import { ProductPaginationDto } from 'src/common/pagination/dto/product/productPagination.dto';
-import { RolesGuard } from 'src/common/guards/roles.guard';
-import { Roles } from 'src/common/decorator/roles.decorator';
-import { Role } from 'src/common/enums/roles.enum';
+import { Roles } from '@common/decorator/roles.decorator';
+import { Role } from '@common/enums/roles.enum';
+import { JwtAuthGuard } from '@common/guards/jwt.guard';
+import { RolesGuard } from '@common/guards/roles.guard';
+import { ProductPaginationDto } from '@common/pagination/dto/product/productPagination.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()

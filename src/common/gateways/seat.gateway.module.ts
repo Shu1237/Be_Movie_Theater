@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
-import { SeatModule } from 'src/modules/seat/seat.module';
+
 import { MyGateWay } from './seat.gateway';
+import { SeatModule } from '@modules/seat/seat.module';
 
 @Module({
   imports: [SeatModule],

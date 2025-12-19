@@ -1,60 +1,48 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, Between } from 'typeorm';
-import { Order } from 'src/database/entities/order/order';
-import { OrderDetail } from 'src/database/entities/order/order-detail';
-import { PaymentMethod } from 'src/database/entities/order/payment-method';
-import { Transaction } from 'src/database/entities/order/transaction';
-import {
-  HoldSeatType,
-  JWTUserType,
-  OrderBillType,
-  SeatInfo,
-} from 'src/common/utils/type';
-import { User } from 'src/database/entities/user/user';
-import { Promotion } from 'src/database/entities/promotion/promotion';
-import { Schedule } from 'src/database/entities/cinema/schedule';
-import { Ticket } from 'src/database/entities/order/ticket';
-import { TicketType } from 'src/database/entities/order/ticket-type';
+import Redis from 'ioredis';
+import { Transaction } from '@database/entities/order/transaction';
+import { AudienceType } from '@common/enums/audience_type.enum';
+
+import { PaymentGateway } from '@common/enums/payment_gatewat.enum';
+import { ProductTypeEnum } from '@common/enums/product.enum';
+import { Role } from '@common/enums/roles.enum';
+import { StatusOrder } from '@common/enums/status-order.enum';
+import { StatusSeat } from '@common/enums/status_seat.enum';
+import { MyGateWay } from '@common/gateways/seat.gateway';
+import { applySorting } from '@common/pagination/apply_sort';
+import { applyCommonFilters } from '@common/pagination/applyCommonFilters';
+import { applyPagination } from '@common/pagination/applyPagination';
+import { OrderPaginationDto } from '@common/pagination/dto/order/orderPagination.dto';
+import { orderFieldMapping } from '@common/pagination/fillters/order-field-mapping';
+import { buildPaginationResponse } from '@common/pagination/pagination-response';
+import { applyAudienceDiscount, calculateProductTotal, roundUpToNearest, formatDate } from '@common/utils/helper';
+import { JWTUserType, OrderBillType, SeatInfo, HoldSeatType } from '@common/utils/type';
+import { Schedule } from '@database/entities/cinema/schedule';
+import { ScheduleSeat } from '@database/entities/cinema/schedule_seat';
+import { Combo } from '@database/entities/item/combo';
+import { Product } from '@database/entities/item/product';
+import { DailyTransactionSummary } from '@database/entities/order/daily_transaction_summary';
+import { HistoryScore } from '@database/entities/order/history_score';
+import { Order } from '@database/entities/order/order';
+import { OrderDetail } from '@database/entities/order/order-detail';
+import { OrderExtra } from '@database/entities/order/order-extra';
+import { PaymentMethod } from '@database/entities/order/payment-method';
+import { Ticket } from '@database/entities/order/ticket';
+import { TicketType } from '@database/entities/order/ticket-type';
+import { Promotion } from '@database/entities/promotion/promotion';
+import { User } from '@database/entities/user/user';
+import { TicketService } from '@modules/ticket/ticket.service';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { MomoService } from './payment-menthod/momo/momo.service';
 import { PayPalService } from './payment-menthod/paypal/paypal.service';
-import { Method } from 'src/common/enums/payment-menthod.enum';
 import { VisaService } from './payment-menthod/visa/visa.service';
 import { VnpayService } from './payment-menthod/vnpay/vnpay.service';
-import { MomoService } from './payment-menthod/momo/momo.service';
 import { ZalopayService } from './payment-menthod/zalopay/zalopay.service';
-import { ScheduleSeat } from 'src/database/entities/cinema/schedule_seat';
-import { StatusSeat } from 'src/common/enums/status_seat.enum';
-import Redis from 'ioredis';
-import { StatusOrder } from 'src/common/enums/status-order.enum';
-import { MyGateWay } from 'src/common/gateways/seat.gateway';
-import { OrderExtra } from 'src/database/entities/order/order-extra';
-import { Product } from 'src/database/entities/item/product';
-import {
-  applyAudienceDiscount,
-  calculateProductTotal,
-  formatDate,
-  roundUpToNearest,
-} from 'src/common/utils/helper';
-import { ProductTypeEnum } from 'src/common/enums/product.enum';
-import { Combo } from 'src/database/entities/item/combo';
-import { NotFoundException } from 'src/common/exceptions/not-found.exception';
-import { BadRequestException } from 'src/common/exceptions/bad-request.exception';
-import { ConflictException } from 'src/common/exceptions/conflict.exception';
-import { ForbiddenException } from 'src/common/exceptions/forbidden.exception';
-import { ConfigService } from '@nestjs/config';
-import { TicketService } from '../ticket/ticket.service';
-import { Role } from 'src/common/enums/roles.enum';
-import { HistoryScore } from 'src/database/entities/order/history_score';
-import { JwtService } from '@nestjs/jwt';
-import { OrderPaginationDto } from 'src/common/pagination/dto/order/orderPagination.dto';
-import { applyCommonFilters } from 'src/common/pagination/applyCommonFilters';
-import { orderFieldMapping } from 'src/common/pagination/fillters/order-field-mapping';
-import { applySorting } from 'src/common/pagination/apply_sort';
-import { buildPaginationResponse } from 'src/common/pagination/pagination-response';
-import { applyPagination } from 'src/common/pagination/applyPagination';
-import { PaymentGateway } from 'src/common/enums/payment_gatewat.enum';
-import { DailyTransactionSummary } from 'src/database/entities/order/daily_transaction_summary';
-import { AudienceType } from 'src/common/enums/audience_type.enum';
+import { Method } from '@common/enums/payment-menthod.enum';
+
 @Injectable()
 export class OrderService {
   constructor(

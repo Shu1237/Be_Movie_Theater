@@ -20,11 +20,12 @@ import {
   ApiOperation,
   ApiQuery,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
-import { ActorPaginationDto } from 'src/common/pagination/dto/actor/actor-pagination.dto';
-import { RolesGuard } from 'src/common/guards/roles.guard';
-import { Roles } from 'src/common/decorator/roles.decorator';
-import { Role } from 'src/common/enums/roles.enum';
+import { ActorPaginationDto } from '@common/pagination/dto/actor/actor-pagination.dto';
+import { Roles } from '@common/decorator/roles.decorator';
+import { Role } from '@common/enums/roles.enum';
+import { JwtAuthGuard } from '@common/guards/jwt.guard';
+import { RolesGuard } from '@common/guards/roles.guard';
+
 
 
 @Controller('actor')
@@ -35,63 +36,9 @@ export class ActorController {
 
   // GET - get list of actors 
   @Get()
-  @ApiOperation({ summary: 'Get all actors for admin' })
+  @ApiOperation({ summary: 'Get all actors ' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
-  @ApiQuery({
-    name: 'search',
-    required: false,
-    type: String,
-    example: 'name | stage_name | nationality',
-  })
-  @ApiQuery({
-    name: 'sortBy',
-    required: false,
-    type: String,
-    example: 'name | stage_name | nationality | gender | date_of_birth',
-  })
-  @ApiQuery({
-    name: 'sortOrder',
-    required: false,
-    enum: ['ASC', 'DESC'],
-    example: 'ASC',
-  })
-  @ApiQuery({
-    name: 'name',
-    required: false,
-    type: String,
-    example: 'Christopher',
-  })
-  @ApiQuery({
-    name: 'stage_name',
-    required: false,
-    type: String,
-    example: 'Johnny',
-  })
-  @ApiQuery({
-    name: 'gender',
-    required: false,
-    enum: ['male', 'female'],
-    example: 'male',
-  })
-  @ApiQuery({
-    name: 'nationality',
-    required: false,
-    type: String,
-    example: 'American',
-  })
-  @ApiQuery({
-    name: 'date_of_birth',
-    required: false,
-    type: String,
-    example: '1990-01-01',
-  })
-  @ApiQuery({
-    name: 'is_deleted',
-    required: false,
-    type: Boolean,
-    example: false,
-  })
   async getAllActors(@Query() query: ActorPaginationDto) {
     const { page = 1, take = 10, ...restFilters } = query;
     return await this.actorService.getAllActors({
@@ -112,7 +59,7 @@ export class ActorController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.EMPLOYEE)
   @Post()
-  @ApiOperation({ summary: 'Create a new actor' })
+  @ApiOperation({ summary: 'Create a new actor (admin, employee only)' })
   @ApiBearerAuth()
   async createActor(@Body() createActorDto: CreateActorDto) {
     return await this.actorService.createActor(createActorDto);
@@ -123,7 +70,7 @@ export class ActorController {
   @Roles(Role.ADMIN, Role.EMPLOYEE)
   @Put(':id')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update actor details' })
+  @ApiOperation({ summary: 'Update actor details (admin, employee only)' })
   async updateActor(
     @Param('id') id: string,
     @Body() updateActorDto: UpdateActorDto,
@@ -158,7 +105,7 @@ export class ActorController {
   @Roles(Role.ADMIN, Role.EMPLOYEE)
   @Delete(':id')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Permanently delete an actor' })
+  @ApiOperation({ summary: 'Permanently delete an actor (admin, employee only)' })
   async removeActor(@Param('id') id: string) {
     return await this.actorService.removeActor(+id);
   }

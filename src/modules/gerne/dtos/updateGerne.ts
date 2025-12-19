@@ -1,8 +1,4 @@
-import { IsOptional, IsString, MaxLength } from 'class-validator';
+import { PartialType } from '@nestjs/swagger';
+import { CreateGerneDto } from './createGerne';
 
-export class UpdateGerneDto {
-  @IsOptional()
-  @IsString()
-  @MaxLength(255)
-  genre_name: string;
-}
+export class UpdateGerneDto extends PartialType(CreateGerneDto) {}

@@ -1,12 +1,13 @@
 
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Request } from 'express';
-import { AuthService } from 'src/modules/auth/auth.service';
+
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
 import { InternalServerErrorException } from '../exceptions/internal-server-error.exception';
 import { UnauthorizedException } from '../exceptions/unauthorized.exception';
 import { ForbiddenException } from '../exceptions/forbidden.exception';
+import { AuthService } from '@modules/auth/auth.service';
 
 @Injectable()
 export class RefreshGuard implements CanActivate {
@@ -57,12 +58,12 @@ export class RefreshGuard implements CanActivate {
     }
 
     //  check refresh token in db
-    const user = await this.authService.validateRefreshToken(refreshToken);
-    if (!user) {
-      throw new UnauthorizedException('Invalid or expired refresh token');
-    }
+    // const user = await this.authService.validateRefreshToken(refreshToken);
+    // if (!user) {
+    //   throw new UnauthorizedException('Invalid or expired refresh token');
+    // }
 
-    req.user = user;
+    // req.user = user;
     return true;
   }
 }

@@ -1,18 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Promotion } from 'src/database/entities/promotion/promotion';
 import { Repository } from 'typeorm';
 import { CreatePromotionDto } from './dto/create-promotion.dto';
 import { UpdatePromotionDto } from './dto/update-promotion.dto';
-import { BadRequestException } from 'src/common/exceptions/bad-request.exception';
-import { NotFoundException } from 'src/common/exceptions/not-found.exception';
-import { PromotionPaginationDto } from 'src/common/pagination/dto/promotion/promotionPagination.dto';
-import { applyCommonFilters } from 'src/common/pagination/applyCommonFilters';
-import { promotionFieldMapping } from 'src/common/pagination/fillters/promtion-field-mapping';
-import { applySorting } from 'src/common/pagination/apply_sort';
-import { applyPagination } from 'src/common/pagination/applyPagination';
-import { buildPaginationResponse } from 'src/common/pagination/pagination-response';
-import { PromotionType } from 'src/database/entities/promotion/promtion_type';
+import { applySorting } from '@common/pagination/apply_sort';
+import { applyCommonFilters } from '@common/pagination/applyCommonFilters';
+import { applyPagination } from '@common/pagination/applyPagination';
+import { PromotionPaginationDto } from '@common/pagination/dto/promotion/promotionPagination.dto';
+import { promotionFieldMapping } from '@common/pagination/fillters/promtion-field-mapping';
+import { buildPaginationResponse } from '@common/pagination/pagination-response';
+import { Promotion } from '@database/entities/promotion/promotion';
+import { PromotionType } from '@database/entities/promotion/promtion_type';
+
 
 @Injectable()
 export class PromotionService {

@@ -16,11 +16,12 @@ import { CinemaRoomService } from './cinema-room.service';
 import { CreateCinemaRoomDto } from './dto/create-cinema-room.dto';
 import { UpdateCinemaRoomDto } from './dto/update-cinema-room.dto';
 import { ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
-import { CinemaRoomPaginationDto } from 'src/common/pagination/dto/cinmeroom/cinmearoomPagiantion.dto';
-import { Roles } from 'src/common/decorator/roles.decorator';
-import { Role } from 'src/common/enums/roles.enum';
-import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from '@common/decorator/roles.decorator';
+import { Role } from '@common/enums/roles.enum';
+import { JwtAuthGuard } from '@common/guards/jwt.guard';
+import { RolesGuard } from '@common/guards/roles.guard';
+import { CinemaRoomPaginationDto } from '@common/pagination/dto/cinmeroom/cinmearoomPagiantion.dto';
+
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -31,27 +32,13 @@ export class CinemaRoomController {
 
   // GET - get list of cinema rooms for admin (with pagination)
   @Get()
-  @ApiOperation({ summary: 'Get all cinema rooms for admin' })
+  @ApiOperation({ summary: 'Get all cinema rooms ' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
-  @ApiQuery({
-    name: 'search',
-    required: false,
-    type: String,
-    example: 'Room 1',
-  })
-  @ApiQuery({
-    name: 'sortOrder',
-    required: false,
-    enum: ['ASC', 'DESC'],
-    example: 'ASC',
-  })
-  @Roles(Role.ADMIN, Role.EMPLOYEE)
-  @UseGuards(RolesGuard)
   @ApiQuery({ name: 'is_deleted', required: false, type: Boolean, example: false })
   async findAll(@Query() query: CinemaRoomPaginationDto) {
     const { page = 1, take = 10, ...restFilters } = query;
-    return this.cinemaRoomService.findAll({
+    return this.cinemaRoomService.findAllCinemaRooms({
       page,
       take: Math.min(take, 100),
       ...restFilters,
@@ -62,7 +49,7 @@ export class CinemaRoomController {
   @Get(':id')
   @ApiOperation({ summary: 'Get cinema room by ID' })
   async findOne(@Param('id') id: number) {
-    return await this.cinemaRoomService.findOne(id);
+    return await this.cinemaRoomService.findCinemaRoomById(id);
   }
 
   // POST - Create a new cinema room
@@ -71,7 +58,7 @@ export class CinemaRoomController {
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Create a new cinema room (admin, employee only)' })
   async create(@Body() createCinemaRoomDto: CreateCinemaRoomDto) {
-    return await this.cinemaRoomService.create(createCinemaRoomDto);
+    return await this.cinemaRoomService.createCinemaRoom(createCinemaRoomDto);
   }
 
   // PUT - Update cinema room by ID
@@ -83,7 +70,7 @@ export class CinemaRoomController {
     @Param('id') id: number,
     @Body() updateCinemaRoomDto: UpdateCinemaRoomDto,
   ) {
-    return await this.cinemaRoomService.update(id, updateCinemaRoomDto);
+    return await this.cinemaRoomService.updateCinemaRoom(id, updateCinemaRoomDto);
   }
 
   // PATCH - Soft delete cinema room
@@ -114,7 +101,7 @@ export class CinemaRoomController {
   @Delete(':id')
   @ApiOperation({ summary: 'Delete cinema room by ID (admin, employee only)' })
   async remove(@Param('id') id: number) {
-    return await this.cinemaRoomService.remove(id);
+    return await this.cinemaRoomService.removeCinemaRoom(id);
   }
 }
 

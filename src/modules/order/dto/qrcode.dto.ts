@@ -3,7 +3,8 @@ import { IsNotEmpty, IsString } from 'class-validator';
 
 export class ScanQrCodeDto {
   @ApiProperty({
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+    description: 'QR code data to be scanned',
+    example: 'sample-qrcode-data',
   })
   @IsString()
   @IsNotEmpty()

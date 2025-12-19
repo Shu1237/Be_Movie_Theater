@@ -1,18 +1,7 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { BaseErrorResponse } from "./base-error-request";
 
-export class ResponseForbidden {
-  @ApiProperty({ example: "Forbidden" })
-  message: string;
-
-  @ApiProperty({ example: 403 })
-  statusCode: number;
-
-  constructor(message = "Forbidden", statusCode = 403) {
-    this.message = message;
-    this.statusCode = statusCode;
-  }
-
-  static error(message = "Forbidden", statusCode = 403) {
-    return new ResponseForbidden(message, statusCode);
+export class ResponseForbidden extends BaseErrorResponse {
+  constructor(message = 'Forbidden') {
+    super(403, 'Forbidden', message);
   }
 }

@@ -11,7 +11,8 @@ import {
   IsEnum,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Gender } from 'src/common/enums/gender.enum';
+import { Gender } from '@common/enums/gender.enum';
+
 
 export class CreateAccountDto {
 

@@ -1,25 +1,24 @@
-import { Injectable } from '@nestjs/common';
-import { Movie } from 'src/database/entities/cinema/movie';
-import { ApiTags } from '@nestjs/swagger';
-import { In, Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Actor } from 'src/database/entities/cinema/actor';
-import { Gerne } from 'src/database/entities/cinema/gerne';
-import { UpdateMovieDto } from './dtos/updateMovie.dto';
-import { CreateMovieDto } from './dtos/createMovie.dto';
-import { Version } from 'src/database/entities/cinema/version';
-import { IMovie } from 'src/common/utils/type';
-import { NotFoundException } from 'src/common/exceptions/not-found.exception';
-import { BadRequestException } from 'src/common/exceptions/bad-request.exception';
-import { MoviePaginationDto } from 'src/common/pagination/dto/movie/moviePagination.dto';
-import { applyCommonFilters } from 'src/common/pagination/applyCommonFilters';
-import { movieFieldMapping } from 'src/common/pagination/fillters/movieFieldMapping';
-import { applySorting } from 'src/common/pagination/apply_sort';
-import { applyPagination } from 'src/common/pagination/applyPagination';
-import { buildPaginationResponse } from 'src/common/pagination/pagination-response';
-import { ResponseList } from 'src/common/response/response-list';
-import { ResponseDetail } from 'src/common/response/response-detail-create-update';
-import { ResponseMsg } from 'src/common/response/response-message';
+import { applySorting } from "@common/pagination/apply_sort";
+import { applyCommonFilters } from "@common/pagination/applyCommonFilters";
+import { applyPagination } from "@common/pagination/applyPagination";
+import { MoviePaginationDto } from "@common/pagination/dto/movie/moviePagination.dto";
+import { movieFieldMapping } from "@common/pagination/fillters/movieFieldMapping";
+import { buildPaginationResponse } from "@common/pagination/pagination-response";
+import { ResponseDetail } from "@common/response/response-detail-create-update";
+import { ResponseList } from "@common/response/response-list";
+import { ResponseMsg } from "@common/response/response-message";
+import { IMovie } from "@common/utils/type";
+import { Actor } from "@database/entities/cinema/actor";
+import { Gerne } from "@database/entities/cinema/gerne";
+import { Movie } from "@database/entities/cinema/movie";
+import { Version } from "@database/entities/cinema/version";
+import { Injectable,  NotFoundException, BadRequestException } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository, In } from "typeorm";
+import { CreateMovieDto } from "./dtos/createMovie.dto";
+import { UpdateMovieDto } from "./dtos/updateMovie.dto";
+
 
 @ApiTags('Movies')
 @Injectable()

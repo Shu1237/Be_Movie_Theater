@@ -6,7 +6,7 @@ export class SeatType {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @Column({ type: 'varchar', nullable: false, length: 100 })
+  @Column({ type: 'varchar', nullable: false, length: 100, unique: true })
   seat_type_name: string;
 
   @Column({ type: 'decimal', nullable: false })

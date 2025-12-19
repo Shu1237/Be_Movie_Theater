@@ -1,13 +1,13 @@
+import { StatusOrder } from '@common/enums/status-order.enum';
+import { StatusSeat } from '@common/enums/status_seat.enum';
+import { MyGateWay } from '@common/gateways/seat.gateway';
+import { ScheduleSeat } from '@database/entities/cinema/schedule_seat';
+import { Order } from '@database/entities/order/order';
+import { OrderExtra } from '@database/entities/order/order-extra';
+import { Transaction } from '@database/entities/order/transaction';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
-import { StatusOrder } from 'src/common/enums/status-order.enum';
-import { StatusSeat } from 'src/common/enums/status_seat.enum';
-import { MyGateWay } from 'src/common/gateways/seat.gateway';
-import { ScheduleSeat } from 'src/database/entities/cinema/schedule_seat';
-import { Order } from 'src/database/entities/order/order';
-import { OrderExtra } from 'src/database/entities/order/order-extra';
-import { Transaction } from 'src/database/entities/order/transaction';
 import { Repository, LessThan } from 'typeorm';
 
 @Injectable()

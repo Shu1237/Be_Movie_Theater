@@ -1,16 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { Ticket } from 'src/database/entities/order/ticket';
+import { applyCommonFilters } from '@common/pagination/applyCommonFilters';
+import { applyPagination } from '@common/pagination/applyPagination';
+import { TicketPaginationDto } from '@common/pagination/dto/ticket/ticket-pagination.dto';
+import { ticketFieldMapping } from '@common/pagination/fillters/ticket-field-mapping';
+import { buildPaginationResponse } from '@common/pagination/pagination-response';
+import { Ticket } from '@database/entities/order/ticket';
+import { User } from '@database/entities/user/user';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { User } from 'src/database/entities/user/user';
-import { NotFoundException } from 'src/common/exceptions/not-found.exception';
-import { BadRequestException } from 'src/common/exceptions/bad-request.exception';
-import { TicketPaginationDto } from 'src/common/pagination/dto/ticket/ticket-pagination.dto';
-import { applyCommonFilters } from 'src/common/pagination/applyCommonFilters';
-import { ticketFieldMapping } from 'src/common/pagination/fillters/ticket-field-mapping';
-import { buildPaginationResponse } from 'src/common/pagination/pagination-response';
-import { applySorting } from 'src/common/pagination/apply_sort';
-import { applyPagination } from 'src/common/pagination/applyPagination';
+
 
 @Injectable()
 export class TicketService {
@@ -112,13 +110,13 @@ export class TicketService {
       'ticket.is_used',
       'ticket.status',
     ];
-    applySorting(
-      qb,
-      fillters.sortBy,
-      fillters.sortOrder,
-      allowedSortFields,
-      'schedule.id',
-    );
+    // applySorting(
+    //   qb,
+    //   fillters.sortBy,
+    //   fillters.sortOrder,
+    //   allowedSortFields,
+    //   'schedule.id',
+    // );
 
     applyPagination(qb, {
       page: fillters.page,
@@ -188,13 +186,13 @@ export class TicketService {
       'movie.name',
       'version.name',
     ];
-    applySorting(
-      qb,
-      fillters.sortBy,
-      fillters.sortOrder,
-      allowedSortFields,
-      'schedule.id',
-    );
+    // applySorting(
+    //   qb,
+    //   fillters.sortBy,
+    //   fillters.sortOrder,
+    //   allowedSortFields,
+    //   'schedule.id',
+    // );
 
     applyPagination(qb, {
       page: fillters.page,

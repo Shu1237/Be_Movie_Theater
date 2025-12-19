@@ -1,16 +1,7 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { BaseErrorResponse } from "./base-error-request";
 
-export class ResponseNotFound {
-  @ApiProperty({ example: "Resource not found" })
-  message: string;
-  @ApiProperty({ example: 404 })
-  statusCode: number;
-
-  constructor(message = "Resource not found", statusCode = 404) {
-    this.message = message;
-    this.statusCode = statusCode;
-  }
-  static error(message = "Resource not found", statusCode = 404) {
-    return new ResponseNotFound(message, statusCode);
+export class ResponseNotFound extends BaseErrorResponse {
+  constructor(message = 'Resource not found') {
+    super(404, 'Not Found', message);
   }
 }

@@ -1,30 +1,33 @@
 import { Transform } from 'class-transformer';
 import { BasePaginationDto } from '../basePagination.dto';
 import { IsBoolean, IsIn, IsOptional, IsString } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class ActorPaginationDto extends BasePaginationDto {
+  @ApiPropertyOptional({
+    description: 'Search term to filter results',
+    example: 'name | stage_name | nationality',
+  })
   @IsOptional()
   @IsString()
-  name?: string;
+  search?: string;
 
+  @ApiPropertyOptional({
+    description: 'Field to sort by',
+    enum: ['actor.id', 'actor.name', 'actor.stage_name', 'actor.nationality', 'actor.gender'],
+    example: 'actor.id',
+  })
   @IsOptional()
-  @IsString()
-  stage_name?: string;
+  @IsIn(['actor.id', 'actor.name', 'actor.stage_name', 'actor.nationality', 'actor.gender'])
+  sortBy?: 'actor.id' | 'actor.name' | 'actor.stage_name' | 'actor.nationality' | 'actor.gender' = 'actor.id';
 
-  @IsOptional()
-  @IsString()
-  nationality?: string;
 
-  @IsOptional()
-  @IsString()
-  date_of_birth?: string;
-
+ 
   @IsOptional()
   @IsIn(['male', 'female'], {
     message: 'Gender must be male or female',
   })
   gender?: string;
-
 
   @Transform(({ value }) => value === 'true' || value === true)
   @IsOptional()

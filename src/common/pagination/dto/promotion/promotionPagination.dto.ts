@@ -1,13 +1,25 @@
 import { BasePaginationDto } from '../basePagination.dto';
-import {
-  IsOptional,
-  IsNumber,
-  IsString,
-  IsBoolean,
-} from 'class-validator';
+import { IsOptional, IsNumber, IsString, IsBoolean } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class PromotionPaginationDto extends BasePaginationDto {
+  @ApiPropertyOptional({
+    description: 'Search term to filter results',
+    example: 'promotion.detail |promotion.title',
+  })
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @ApiPropertyOptional({
+    description: 'Field to sort by',
+    example: 'promotion.exchange | promotionType.id',
+  })
+  @IsOptional()
+  @IsString()
+  sortBy?: string;
+
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
@@ -33,10 +45,10 @@ export class PromotionPaginationDto extends BasePaginationDto {
 
   @IsOptional()
   @IsString()
-  endTime?: string; 
+  endTime?: string;
 
   @IsOptional()
   @Transform(({ value }) => value === 'true' || value === true)
   @IsBoolean()
-  is_active?: string; 
+  is_active?: string;
 }

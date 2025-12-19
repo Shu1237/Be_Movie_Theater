@@ -8,18 +8,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { HistoryScoreService } from './historyScore.service';
-import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
-import {
-  ApiQuery,
-  ApiOperation,
-  ApiBearerAuth,
-  ApiParam,
-} from '@nestjs/swagger';
-import { HistoryScorePaginationDto } from 'src/common/pagination/dto/historyScore/historyScorePagination.dto';
-import { JWTUserType } from 'src/common/utils/type';
-import { Roles } from 'src/common/decorator/roles.decorator';
-import { Role } from 'src/common/enums/roles.enum';
-import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from '@common/decorator/roles.decorator';
+import { Role } from '@common/enums/roles.enum';
+import { JwtAuthGuard } from '@common/guards/jwt.guard';
+import { RolesGuard } from '@common/guards/roles.guard';
+import { HistoryScorePaginationDto } from '@common/pagination/dto/historyScore/historyScorePagination.dto';
+import { JWTUserType } from '@common/utils/type';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiParam } from '@nestjs/swagger';
+
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -34,31 +30,6 @@ export class HistoryScoreController {
   @ApiOperation({ summary: 'Get all history scores for admin' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
-  @ApiQuery({
-    name: 'startDate',
-    required: false,
-    type: String,
-    example: '2025-07-01',
-  })
-  @ApiQuery({
-    name: 'endDate',
-    required: false,
-    type: String,
-    example: '2025-07-05',
-  })
-  @ApiQuery({ name: 'search', required: false, type: String, example: '' })
-  @ApiQuery({
-    name: 'sortBy',
-    required: false,
-    type: String,
-    example: 'history_score.created_at',
-  })
-  @ApiQuery({
-    name: 'sortOrder',
-    required: false,
-    enum: ['ASC', 'DESC'],
-    example: 'DESC',
-  })
   getHistoryScore(@Query() query: HistoryScorePaginationDto) {
     const { page = 1, take = 10, ...restFilters } = query;
     return this.historyScoreService.getAllHistoryScore({
@@ -73,30 +44,6 @@ export class HistoryScoreController {
   @ApiOperation({ summary: 'Get history scores for user' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
-  @ApiQuery({
-    name: 'startDate',
-    required: false,
-    type: String,
-    example: '2025-07-01',
-  })
-  @ApiQuery({
-    name: 'endDate',
-    required: false,
-    type: String,
-    example: '2025-07-05',
-  })
-  @ApiQuery({
-    name: 'sortBy',
-    required: false,
-    type: String,
-    example: 'history_score.created_at',
-  })
-  @ApiQuery({
-    name: 'sortOrder',
-    required: false,
-    enum: ['ASC', 'DESC'],
-    example: 'DESC',
-  })
   getHistoryScoreByUserId(
     @Query() query: HistoryScorePaginationDto,
     @Request() req :{ user: JWTUserType },

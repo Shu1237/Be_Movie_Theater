@@ -1,8 +1,8 @@
-import { Role } from 'src/common/enums/roles.enum';
-import { OrderExtra } from 'src/database/entities/order/order-extra';
+
+import { Role } from '@common/enums/roles.enum';
 import { AudienceType } from '../enums/audience_type.enum';
-import { StatusOrderWithAllType } from '../enums/status-order.enum';
 import { SelectQueryBuilder } from 'typeorm';
+import { Gender } from '@common/enums/gender.enum';
 
 
 
@@ -83,11 +83,7 @@ export type IGerne = {
   genre_name: string;
 };
 
-export enum Gender {
-  MALE = 'male',
-  FEMALE = 'female',
-  OTHER = 'other',
-}
+
 export type IMovie = {
   id: number;
   name: string;

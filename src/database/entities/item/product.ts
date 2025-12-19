@@ -6,7 +6,8 @@ import {
   OneToMany,
 } from 'typeorm';
 import { OrderExtra } from '../order/order-extra';
-import { ProductTypeEnum } from 'src/common/enums/product.enum';
+import { ProductTypeEnum } from '@common/enums/product.enum';
+
 
 @Entity('product')
 @TableInheritance({ column: { type: 'varchar', name: 'type' } })

@@ -17,15 +17,16 @@ import {
   ApiBody,
   ApiQuery,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
 import { SeatService } from './seat.service';
 import { BulkCreateSeatDto } from './dto/BulkCreateSeatDto';
-import { SeatPaginationDto } from 'src/common/pagination/dto/seat/seatPagination.dto';
 import { BulkSeatOperationDto } from './dto/BulkSeatOperationDto';
+import { Roles } from '@common/decorator/roles.decorator';
+import { Role } from '@common/enums/roles.enum';
+import { JwtAuthGuard } from '@common/guards/jwt.guard';
+import { RolesGuard } from '@common/guards/roles.guard';
+import { SeatPaginationDto } from '@common/pagination/dto/seat/seatPagination.dto';
 import { BulkSeatIdsDto } from './dto/BulkSeatIdsDto';
-import { Roles } from 'src/common/decorator/roles.decorator';
-import { Role } from 'src/common/enums/roles.enum';
-import { RolesGuard } from 'src/common/guards/roles.guard';
+
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -47,43 +48,6 @@ export class SeatController {
   @ApiOperation({ summary: 'Get all seats for admin' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
-  @ApiQuery({
-    name: 'cinema_room_id',
-    required: false,
-    type: Number,
-    example: 1,
-  })
-  @ApiQuery({
-    name: 'seat_type_id',
-    required: false,
-    type: Number,
-    example: 1,
-  })
-  @ApiQuery({ name: 'seat_row', required: false, type: String, example: 'A' })
-  @ApiQuery({
-    name: 'seat_column',
-    required: false,
-    type: String,
-    example: '5',
-  })
-  @ApiQuery({
-    name: 'is_deleted',
-    required: false,
-    type: Boolean,
-    example: false,
-  })
-  @ApiQuery({
-    name: 'sortBy',
-    required: false,
-    type: String,
-    example: 'seat.seat_row',
-  })
-  @ApiQuery({
-    name: 'sortOrder',
-    required: false,
-    enum: ['ASC', 'DESC'],
-    example: 'ASC',
-  })
   getAllSeats(@Query() query: SeatPaginationDto) {
     const { page = 1, take = 10, ...restFilters } = query;
     return this.seatService.getAllSeats({

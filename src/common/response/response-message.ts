@@ -1,16 +1,22 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class ResponseMsg {
-  @ApiProperty({ example: "Action completed successfully" })
+  @ApiProperty({ example: true })
+  success: boolean;
+
+  @ApiProperty({ example: 'Action completed successfully' })
   message: string;
-  constructor(message: string) {
+
+  constructor(message: string, success = true) {
     this.message = message;
-  }
-  static ok(message = "Action completed successfully") {
-    return new ResponseMsg(message);
+    this.success = success;
   }
 
-  static fail(message = "Action failed") {
-    return new ResponseMsg(message);
+  static ok(message = 'Action completed successfully') {
+    return new ResponseMsg(message, true);
+  }
+
+  static fail(message = 'Action failed') {
+    return new ResponseMsg(message, false);
   }
 }

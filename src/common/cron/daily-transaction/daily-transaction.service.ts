@@ -1,7 +1,8 @@
+import { PaymentGateway } from '@common/enums/payment_gatewat.enum';
+import { OrderService } from '@modules/order/order.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import { PaymentGateway } from 'src/common/enums/payment_gatewat.enum';
-import { OrderService } from 'src/modules/order/order.service';
+
 
 @Injectable()
 export class ReportService {

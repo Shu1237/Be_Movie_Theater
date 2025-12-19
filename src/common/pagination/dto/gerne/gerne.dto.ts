@@ -1,11 +1,28 @@
-import { extend } from 'dayjs';
+
 import { BasePaginationDto } from '../basePagination.dto';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsOptional } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class GernePaginationDto extends BasePaginationDto {
-      @Transform(({ value }) => value === 'true' || value === true)
-      @IsOptional()
-      @IsBoolean()
-      is_deleted?: boolean;
+  @ApiPropertyOptional({
+    description: 'Search term to filter results',
+    example: 'name',
+  })
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @ApiPropertyOptional({
+    description: 'Field to sort by',
+    example: 'gerne.genre_name | gerne.id',
+  })
+  @IsOptional()
+  @IsString()
+  sortBy?: string;
+
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsOptional()
+  @IsBoolean()
+  is_deleted?: boolean;
 }

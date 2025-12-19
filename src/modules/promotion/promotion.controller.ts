@@ -13,17 +13,18 @@ import {
 import { PromotionService } from './promotion.service';
 import { CreatePromotionDto } from './dto/create-promotion.dto';
 import { UpdatePromotionDto } from './dto/update-promotion.dto';
-import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
 import {
   ApiBearerAuth,
   ApiOperation,
   ApiBody,
   ApiQuery,
 } from '@nestjs/swagger';
-import { PromotionPaginationDto } from 'src/common/pagination/dto/promotion/promotionPagination.dto';
-import { RolesGuard } from 'src/common/guards/roles.guard';
-import { Roles } from 'src/common/decorator/roles.decorator';
-import { Role } from 'src/common/enums/roles.enum';
+import { Roles } from '@common/decorator/roles.decorator';
+import { Role } from '@common/enums/roles.enum';
+import { JwtAuthGuard } from '@common/guards/jwt.guard';
+import { RolesGuard } from '@common/guards/roles.guard';
+import { PromotionPaginationDto } from '@common/pagination/dto/promotion/promotionPagination.dto';
+
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()

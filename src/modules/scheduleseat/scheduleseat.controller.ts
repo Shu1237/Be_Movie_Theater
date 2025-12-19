@@ -6,8 +6,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ScheduleSeatService } from './scheduleseat.service';
-import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { JwtAuthGuard } from '@common/guards/jwt.guard';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()

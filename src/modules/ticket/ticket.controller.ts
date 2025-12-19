@@ -1,12 +1,13 @@
 import { Controller, Get, Param, UseGuards, Req, Query } from '@nestjs/common';
 import { TicketService } from './ticket.service';
-import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
-import { JWTUserType } from 'src/common/utils/type';
 import { ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
-import { TicketPaginationDto } from 'src/common/pagination/dto/ticket/ticket-pagination.dto';
-import { Roles } from 'src/common/decorator/roles.decorator';
-import { Role } from 'src/common/enums/roles.enum';
-import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from '@common/decorator/roles.decorator';
+import { Role } from '@common/enums/roles.enum';
+import { JwtAuthGuard } from '@common/guards/jwt.guard';
+import { RolesGuard } from '@common/guards/roles.guard';
+import { TicketPaginationDto } from '@common/pagination/dto/ticket/ticket-pagination.dto';
+
+
 
 @UseGuards(JwtAuthGuard)
 @Controller('ticket')

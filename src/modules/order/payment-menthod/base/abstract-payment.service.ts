@@ -1,23 +1,25 @@
 
 
+import { Role } from "@common/enums/roles.enum";
+import { StatusOrder } from "@common/enums/status-order.enum";
+import { StatusSeat } from "@common/enums/status_seat.enum";
+import { MyGateWay } from "@common/gateways/seat.gateway";
+import { MailService } from "@common/mail/mail.service";
+import { QrCodeService } from "@common/qrcode/qrcode.service";
+import { ScheduleSeat } from "@database/entities/cinema/schedule_seat";
+import { HistoryScore } from "@database/entities/order/history_score";
+import { Order } from "@database/entities/order/order";
+import { OrderExtra } from "@database/entities/order/order-extra";
+import { Ticket } from "@database/entities/order/ticket";
+import { Transaction } from "@database/entities/order/transaction";
+import { User } from "@database/entities/user/user";
 import { NotFoundException } from "@nestjs/common/exceptions/not-found.exception";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Role } from "src/common/enums/roles.enum";
-import { StatusOrder } from "src/common/enums/status-order.enum";
-import { StatusSeat } from "src/common/enums/status_seat.enum";
-import { MyGateWay } from "src/common/gateways/seat.gateway";
-import { MailService } from "src/common/mail/mail.service";
-import { QrCodeService } from "src/common/qrcode/qrcode.service";
-import { ScheduleSeat } from "src/database/entities/cinema/schedule_seat";
-import { HistoryScore } from "src/database/entities/order/history_score";
-import { Order } from "src/database/entities/order/order";
-import { OrderExtra } from "src/database/entities/order/order-extra";
-import { Ticket } from "src/database/entities/order/ticket";
-import { Transaction } from "src/database/entities/order/transaction";
-import { User } from "src/database/entities/user/user";
 import { In, Repository } from "typeorm";
+
+
 
 
 

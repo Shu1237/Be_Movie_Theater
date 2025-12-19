@@ -2,10 +2,11 @@ import { Module } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ProductController } from './product.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Product } from 'src/database/entities/item/product';
-import { Combo } from 'src/database/entities/item/combo';
-import { Food } from 'src/database/entities/item/food';
-import { Drink } from 'src/database/entities/item/drink';
+import { Combo } from '@database/entities/item/combo';
+import { Drink } from '@database/entities/item/drink';
+import { Food } from '@database/entities/item/food';
+import { Product } from '@database/entities/item/product';
+
 
 @Module({
   imports: [TypeOrmModule.forFeature([Product, Combo, Food, Drink])],

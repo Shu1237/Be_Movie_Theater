@@ -14,12 +14,11 @@ export class Gerne {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true, unique: true })
   genre_name: string;
+  
   @Column({ type: 'boolean', default: false })
   is_deleted: boolean; //
-  // @OneToMany(() => MovieGenre, (movieGenre) => movieGenre.genre)
-  // movieGenres: MovieGenre[];
 
   @ManyToMany(() => Movie, (movie) => movie.gernes)
   @JoinTable()

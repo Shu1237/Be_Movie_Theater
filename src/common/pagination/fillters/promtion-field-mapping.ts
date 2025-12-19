@@ -1,5 +1,5 @@
-import { Search } from '@nestjs/common';
-import { FilterField } from 'src/common/utils/type';
+
+import { FilterField } from '@common/utils/type';
 import { SelectQueryBuilder } from 'typeorm';
 
 export const promotionFieldMapping: Record<string, FilterField> = {

@@ -1,4 +1,5 @@
-import { FilterField } from 'src/common/utils/type';
+import { FilterField } from "@common/utils/type";
+
 
 export const cinemaRoomFieldMapping: Record<string, FilterField> = {
   is_deleted: {

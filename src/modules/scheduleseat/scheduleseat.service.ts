@@ -1,7 +1,7 @@
+import { NotFoundException } from '@common/exceptions/not-found.exception';
+import { ScheduleSeat } from '@database/entities/cinema/schedule_seat';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm/dist/common/typeorm.decorators';
-import { NotFoundException } from 'src/common/exceptions/not-found.exception';
-import { ScheduleSeat } from 'src/database/entities/cinema/schedule_seat';
 import { Repository } from 'typeorm/repository/Repository';
 
 

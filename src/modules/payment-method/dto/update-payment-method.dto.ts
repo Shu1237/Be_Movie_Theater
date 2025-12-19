@@ -1,12 +1,5 @@
 import { IsOptional, IsString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { CreatePaymentMethodDto } from './create-payment-method.dto';
 
-export class UpdatePaymentMethodDto {
-  @IsOptional()
-  @IsString()
-  @ApiProperty({
-    example: 'Credit Card',
-    description: 'Tên phương thức thanh toán',
-  })
-  name?: string;
-}
+export class UpdatePaymentMethodDto  extends PartialType(CreatePaymentMethodDto) {}

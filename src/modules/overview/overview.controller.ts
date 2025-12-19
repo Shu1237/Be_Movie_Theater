@@ -1,12 +1,12 @@
 import { Controller, Get,  UseGuards, Query } from '@nestjs/common';
 import { OverviewService } from './overview.service';
-import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
 import { ApiBearerAuth } from '@nestjs/swagger/dist/decorators/api-bearer.decorator';
 import { ApiOperation, ApiQuery } from '@nestjs/swagger';
-import { DailyReportDto } from 'src/common/pagination/dto/dailyReport/dailyReport.dto';
-import { Roles } from 'src/common/decorator/roles.decorator';
-import { Role } from 'src/common/enums/roles.enum';
-import { RolesGuard } from 'src/common/guards/roles.guard';
+import { Roles } from '@common/decorator/roles.decorator';
+import { Role } from '@common/enums/roles.enum';
+import { JwtAuthGuard } from '@common/guards/jwt.guard';
+import { RolesGuard } from '@common/guards/roles.guard';
+import { DailyReportDto } from '@common/pagination/dto/dailyReport/dailyReport.dto';
 
 
 @Controller('overview')
@@ -21,43 +21,6 @@ export class OverviewController {
   @ApiOperation({ summary: 'Get all daily order reports for admin' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
-  @ApiQuery({
-    name: 'sortBy',
-    required: false,
-    type: String,
-    example:
-      'paymentMethod.id | dailyReport.reportDate | dailyReport.totalAmount | dailyReport.totalOrders| dailyReport.totalFailed ',
-  })
-  @ApiQuery({
-    name: 'sortOrder',
-    required: false,
-    enum: ['ASC', 'DESC'],
-    example: 'DESC',
-  })
-  @ApiQuery({
-    name: 'reportDate',
-    required: false,
-    type: String,
-    example: '2025-07-01',
-  })
-  @ApiQuery({
-    name: 'fromDate',
-    required: false,
-    type: String,
-    example: '2025-07-01',
-  })
-  @ApiQuery({
-    name: 'toDate',
-    required: false,
-    type: String,
-    example: '2025-07-31',
-  })
-  @ApiQuery({
-    name: 'paymentMethod',
-    required: false,
-    type: Number,
-    example: 1,
-  })
   getDailyOrderReports(@Query() query: DailyReportDto) {
     const { page = 1, take = 10, ...restFilters } = query;
     return this.overviewService.getDailyOrderReports({

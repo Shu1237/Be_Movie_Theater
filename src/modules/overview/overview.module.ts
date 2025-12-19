@@ -1,15 +1,16 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Movie } from 'src/database/entities/cinema/movie';
-import { Schedule } from 'src/database/entities/cinema/schedule';
-import { Order } from 'src/database/entities/order/order';
-import { Ticket } from 'src/database/entities/order/ticket';
-import { TicketType } from 'src/database/entities/order/ticket-type';
-import { OrderExtra } from 'src/database/entities/order/order-extra';
-import { User } from 'src/database/entities/user/user';
 import { OverviewController } from './overview.controller';
 import { OverviewService } from './overview.service';
-import { DailyTransactionSummary } from 'src/database/entities/order/daily_transaction_summary';
+import { Movie } from '@database/entities/cinema/movie';
+import { Schedule } from '@database/entities/cinema/schedule';
+import { DailyTransactionSummary } from '@database/entities/order/daily_transaction_summary';
+import { Order } from '@database/entities/order/order';
+import { OrderExtra } from '@database/entities/order/order-extra';
+import { Ticket } from '@database/entities/order/ticket';
+import { TicketType } from '@database/entities/order/ticket-type';
+import { User } from '@database/entities/user/user';
+
 
 @Module({
   imports: [

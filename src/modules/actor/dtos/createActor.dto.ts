@@ -9,10 +9,13 @@ import {
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { Gender } from 'src/common/utils/type';
+import { Gender } from '@common/enums/gender.enum';
 
 export class CreateActorDto {
-  @ApiProperty({ description: 'The name of the actor', example: 'John Doe' })
+  @ApiProperty({
+    description: 'The name of the actor',
+    example: 'John Doe',
+  })
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -30,7 +33,6 @@ export class CreateActorDto {
     description: 'The gender of the actor',
     enum: Gender,
     example: Gender.MALE,
-    examples: [Gender.MALE, Gender.FEMALE, Gender.OTHER],
   })
   @IsEnum(Gender)
   @IsNotEmpty()
@@ -40,7 +42,7 @@ export class CreateActorDto {
     description: 'The date of birth of the actor',
     example: '1990-01-01',
   })
-  @Type(() => Date) // Transform string to Date
+  @Type(() => Date)
   @IsDate()
   @IsNotEmpty()
   date_of_birth: Date;

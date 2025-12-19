@@ -1,4 +1,5 @@
-import { FilterField } from 'src/common/utils/type';
+
+import { FilterField } from '@common/utils/type';
 import { SelectQueryBuilder } from 'typeorm';
 
 export const orderFieldMapping: Record<string, FilterField> = {
@@ -19,7 +20,7 @@ export const orderFieldMapping: Record<string, FilterField> = {
   },
   paymentMethod: {
     field: 'paymentMethod.name',
-    operator: 'LIKE',
+    operator: '=',
     paramName: 'method',
   },
   startDate: {

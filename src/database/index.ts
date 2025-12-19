@@ -18,7 +18,6 @@ import { PromotionType } from './entities/promotion/promtion_type';
 import { Combo } from './entities/item/combo';
 import { Drink } from './entities/item/drink';
 import { Food } from './entities/item/food';
-import { RefreshToken } from './entities/user/refresh-token';
 import { Role } from './entities/user/roles';
 import { User } from './entities/user/user';
 import { Product } from './entities/item/product';
@@ -28,7 +27,6 @@ import { DailyTransactionSummary } from './entities/order/daily_transaction_summ
 export const allEntities = [
   User,
   Role,
-  RefreshToken,
   Food,
   Drink,
   Combo,

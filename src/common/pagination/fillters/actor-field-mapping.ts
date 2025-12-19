@@ -1,4 +1,5 @@
-import { FilterField } from 'src/common/utils/type';
+;
+import { FilterField } from '@common/utils/type';
 import { SelectQueryBuilder } from 'typeorm';
 
 export const actorFieldMapping: Record<string, FilterField> = {
@@ -17,18 +18,6 @@ export const actorFieldMapping: Record<string, FilterField> = {
         { search: `%${value}%` },
       );
     },
-  },
-  name: {
-    operator: 'LIKE',
-    field: 'actor.name',
-  },
-  stage_name: {
-    operator: 'LIKE',
-    field: 'actor.stage_name',
-  },
-  nationality: {
-    operator: 'LIKE',
-    field: 'actor.nationality',
   },
   gender: {
     operator: '=',

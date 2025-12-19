@@ -1,12 +1,13 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Movie } from 'src/database/entities/cinema/movie';
-import { Schedule } from 'src/database/entities/cinema/schedule';
-import { CinemaRoom } from 'src/database/entities/cinema/cinema-room';
-import { Repository, MoreThan, Between } from 'typeorm';
-import { Order } from 'src/database/entities/order/order';
-import { OrderDetail } from 'src/database/entities/order/order-detail';
+import { CinemaRoom } from "@database/entities/cinema/cinema-room";
+import { Movie } from "@database/entities/cinema/movie";
+import { Schedule } from "@database/entities/cinema/schedule";
+import { Order } from "@database/entities/order/order";
+import { OrderDetail } from "@database/entities/order/order-detail";
+import { Injectable, Logger } from "@nestjs/common";
+import { Cron } from "@nestjs/schedule";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository, Between } from "typeorm";
+
 
 
 @Injectable()

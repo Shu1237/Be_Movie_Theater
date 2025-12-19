@@ -1,18 +1,7 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { BaseErrorResponse } from "./base-error-request";
 
-export class ResponseConflict {
-  @ApiProperty({ example: "Conflict" })
-  message: string;
-
-  @ApiProperty({ example: 409 })
-  statusCode: number;
-
-  constructor(message = "Conflict", statusCode = 409) {
-    this.message = message;
-    this.statusCode = statusCode;
-  }
-
-  static error(message = "Conflict", statusCode = 409) {
-    return new ResponseConflict(message, statusCode);
+export class ResponseConflict extends BaseErrorResponse {
+  constructor(message = 'Conflict') {
+    super(409, 'Conflict', message);
   }
 }

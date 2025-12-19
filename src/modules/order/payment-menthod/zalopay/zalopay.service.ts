@@ -7,24 +7,25 @@ import  crypto from 'crypto';
 import axios from 'axios';
 import  moment from 'moment';
 import  dayjs from 'dayjs';
-import { OrderBillType } from 'src/common/utils/type';
-import { StatusOrder } from 'src/common/enums/status-order.enum';
-import { ConfigService } from '@nestjs/config';
-import { MailService } from "src/common/mail/mail.service";
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { MyGateWay } from 'src/common/gateways/seat.gateway';
-import { QrCodeService } from 'src/common/qrcode/qrcode.service';
-import { ScheduleSeat } from 'src/database/entities/cinema/schedule_seat';
-import { HistoryScore } from 'src/database/entities/order/history_score';
-import { Order } from 'src/database/entities/order/order';
-import { OrderExtra } from 'src/database/entities/order/order-extra';
-import { Ticket } from 'src/database/entities/order/ticket';
-import { User } from 'src/database/entities/user/user';
 import { Repository } from 'typeorm';
-import { Transaction } from 'src/database/entities/order/transaction';
+import { PaymentGateway } from '@common/enums/payment_gatewat.enum';
+import { StatusOrder } from '@common/enums/status-order.enum';
+import { MyGateWay } from '@common/gateways/seat.gateway';
+import { MailService } from '@common/mail/mail.service';
+import { QrCodeService } from '@common/qrcode/qrcode.service';
+import { OrderBillType } from '@common/utils/type';
+import { ScheduleSeat } from '@database/entities/cinema/schedule_seat';
+import { HistoryScore } from '@database/entities/order/history_score';
+import { Order } from '@database/entities/order/order';
+import { OrderExtra } from '@database/entities/order/order-extra';
+import { Ticket } from '@database/entities/order/ticket';
+import { User } from '@database/entities/user/user';
+import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
 import { AbstractPaymentService } from '../base/abstract-payment.service';
-import { PaymentGateway } from 'src/common/enums/payment_gatewat.enum';
+import { Transaction } from '@database/entities/order/transaction';
+
 
 @Injectable()
 export class ZalopayService extends AbstractPaymentService {

@@ -1,7 +1,8 @@
+import { Movie } from '@database/entities/cinema/movie';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Movie } from 'src/database/entities/cinema/movie';
+
 import { Repository, LessThan } from 'typeorm';
 
 @Injectable()

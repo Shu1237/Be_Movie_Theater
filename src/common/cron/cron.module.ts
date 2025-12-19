@@ -1,23 +1,22 @@
 import { Module } from '@nestjs/common';
-import { MyGateWayModule } from 'src/common/gateways/seat.gateway.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ScheduleSeat } from 'src/database/entities/cinema/schedule_seat';
-import { RedisModule } from 'src/common/redis/redis.module';
-import { RefreshToken } from 'src/database/entities/user/refresh-token';
-import { RefreshTokenService } from './refresh-token/refresh-token.service';
-import { Movie } from 'src/database/entities/cinema/movie';
-import { Schedule } from 'src/database/entities/cinema/schedule';
+import { OrderCronService } from './order/orderCron.service';
 import { MovieExpireCheckService } from './movie/movieExpireCheck.service';
 import { ScheduleExpireCheckService } from './schedule/scheduleExpireCheck.service';
-import { Order } from 'src/database/entities/order/order';
-import { OrderCronService } from './order/orderCron.service';
-import { Promotion } from 'src/database/entities/promotion/promotion';
-import { PromotionCronService } from './promotion/PromotionCron.Service';
-import { OrderExtra } from 'src/database/entities/order/order-extra';
-import { Transaction } from 'src/database/entities/order/transaction';
-import { SeatModule } from 'src/modules/seat/seat.module';
-import { OrderModule } from 'src/modules/order/order.module';
 import { ReportService } from './daily-transaction/daily-transaction.service';
+import { MyGateWayModule } from '@common/gateways/seat.gateway.module';
+import { RedisModule } from '@common/redis/redis.module';
+import { Movie } from '@database/entities/cinema/movie';
+import { Schedule } from '@database/entities/cinema/schedule';
+import { ScheduleSeat } from '@database/entities/cinema/schedule_seat';
+import { Order } from '@database/entities/order/order';
+import { OrderExtra } from '@database/entities/order/order-extra';
+import { Promotion } from '@database/entities/promotion/promotion';
+import { OrderModule } from '@modules/order/order.module';
+import { SeatModule } from '@modules/seat/seat.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Transaction } from '@database/entities/order/transaction';
+import { PromotionCronService } from './promotion/PromotionCron.Service';
+
 
 @Module({
   imports: [
@@ -25,7 +24,6 @@ import { ReportService } from './daily-transaction/daily-transaction.service';
     MyGateWayModule,
     SeatModule,
     TypeOrmModule.forFeature([
-      RefreshToken,
       ScheduleSeat,
       Schedule,
       Movie,
@@ -37,7 +35,6 @@ import { ReportService } from './daily-transaction/daily-transaction.service';
     OrderModule,
   ],
   providers: [
-    RefreshTokenService,
     MovieExpireCheckService,
     ScheduleExpireCheckService,
     OrderCronService,

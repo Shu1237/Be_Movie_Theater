@@ -1,37 +1,33 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+
 import { InjectRepository } from '@nestjs/typeorm';
-import type { GoogleUserType, JWTUserType } from 'src/common/utils/type';
+import { randomInt } from 'crypto';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
-import { User } from 'src/database/entities/user/user';
-import { RefreshToken } from 'src/database/entities/user/refresh-token';
-import { Role } from 'src/database/entities/user/roles';
-import { NotFoundException } from 'src/common/exceptions/not-found.exception';
-import { ForbiddenException } from 'src/common/exceptions/forbidden.exception';
-import { ConfigService } from '@nestjs/config';
-import { QrCodeService } from 'src/common/qrcode/qrcode.service';
-import { comparePassword, hashPassword } from 'src/common/utils/helper';
-import { UnauthorizedException } from 'src/common/exceptions/unauthorized.exception';
-import { ResponseMsg } from 'src/common/response/response-message';
-import { randomInt } from 'crypto';
-import { SendOtpDto } from 'src/common/mail/dto/sendEmail.dto';
-import { MailService } from 'src/common/mail/mail.service';
-import Redis from 'ioredis';
-import { CreateAccountDto } from './dtos/CreateAccount.dto';
-import { VerifyOtpDto } from 'src/common/mail/dto/verifyOtp.dto';
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
 import { RefreshTokenDto } from './dtos/RefreshToken.dto';
-import { ResponseDetail } from 'src/common/response/response-detail-create-update';
+import Redis from 'ioredis';
+import { CreateAccountDto } from './dtos/CreateAccount.dto';
+import { SendOtpDto } from '@common/mail/dto/sendEmail.dto';
+import { VerifyOtpDto } from '@common/mail/dto/verifyOtp.dto';
+import { MailService } from '@common/mail/mail.service';
+import { QrCodeService } from '@common/qrcode/qrcode.service';
+import { comparePassword, hashPassword } from '@common/utils/helper';
+import { JWTUserType, GoogleUserType } from '@common/utils/type';
+import { User } from '@database/entities/user/user';
+import { ConfigService } from '@nestjs/config';
+import { Role } from '@database/entities/user/roles';
+import { Inject, Injectable } from '@nestjs/common';
+import { NotFoundException } from '@common/exceptions/not-found.exception';
+import { UnauthorizedException } from '@common/exceptions/unauthorized.exception';
+import { ForbiddenException } from '@common/exceptions/forbidden.exception';
+
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Role) private roleRepository: Repository<Role>,
-    @InjectRepository(RefreshToken)
-    private refreshTokenRepository: Repository<RefreshToken>,
 
     @Inject('REDIS_CLIENT') private readonly redisClient: Redis,
     private jwtService: JwtService,
@@ -40,20 +36,20 @@ export class AuthService {
     private mailService: MailService,
   ) {}
 
-  async validateUser(username: string, password: string) {
+  async validateUser(username: string, password: string) : Promise<JWTUserType> {
     const user = await this.userRepository.findOne({
       where: { username: username },
       relations: ['role'],
     });
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('User not found', 'USER_NOT_FOUND');
     }
     const isPasswordValid = await comparePassword(password, user.password);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Wrong password');
+      throw new UnauthorizedException('Wrong password', 'WRONG_PASSWORD');
     }
     if (!user.status) {
-      throw new UnauthorizedException('Account is disabled');
+      throw new UnauthorizedException('Account is disabled', 'ACCOUNT_DISABLED');
     }
     const result: JWTUserType = {
       account_id: user.id,
@@ -70,49 +66,48 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('User not found', 'USER_NOT_FOUND');
     }
 
     if (!user.status) {
-      throw new ForbiddenException('Account is disabled');
+      throw new ForbiddenException('Account is disabled', 'ACCOUNT_DISABLED');
     }
   }
-  async validateRefreshToken(token: string) {
-    const record = await this.refreshTokenRepository.findOne({
-      where: { refresh_token: token, revoked: false },
-      relations: ['user', 'user.role'],
-    });
+  // async validateRefreshToken(token: string) : Promise<JWTUserType | null> {
+  //   const record = await this.refreshTokenRepository.findOne({
+  //     where: { refresh_token: token, revoked: false },
+  //     relations: ['user', 'user.role'],
+  //   });
 
-    if (!record || record.expires_at.getTime() < Date.now()) {
-      return null;
-    }
+  //   if (!record || record.expires_at.getTime() < Date.now()) {
+  //     return null;
+  //   }
 
-    record.revoked = true;
-    await this.refreshTokenRepository.save(record);
+  //   record.revoked = true;
+  //   await this.refreshTokenRepository.save(record);
 
-    const payload: JWTUserType = {
-      account_id: record.user.id,
-      username: record.user.username,
-      role_id: record.user.role.role_id,
-      email: record.user.email,
-      provider: record.user.provider,
-    };
+  //   const payload: JWTUserType = {
+  //     account_id: record.user.id,
+  //     username: record.user.username,
+  //     role_id: record.user.role.role_id,
+  //     email: record.user.email,
+  //     provider: record.user.provider,
+  //   };
 
-    return payload;
-  }
-  async login(user: JWTUserType) :Promise<ResponseDetail<{msg:string, token: {access_token: string, refresh_token: string}}>> {
+  //   return payload;
+  // }
+  async login(user: JWTUserType) :Promise<{access_token: string, refresh_token: string}> {
     const redisKey = `user-${user.account_id}`;
     const existingRefreshToken = await this.redisClient.get(redisKey);
     if (existingRefreshToken) {
       await this.redisClient.del(redisKey);
     }
-    return ResponseDetail.ok({
-      msg: 'Login successful',
-      token: await this.generateToken(user),
-    })
+    return {
+      ...await this.generateToken(user),
+    }
   }
 
-  async loginGoogle(user: GoogleUserType) :Promise<ResponseDetail<{msg:string, token: {access_token: string, refresh_token: string}}>> {
+  async loginGoogle(user: GoogleUserType) :Promise<{access_token: string, refresh_token: string}> {
     // check if user exists
     const existingUser = await this.userRepository.findOne({
       where: { email: user.email },
@@ -156,13 +151,12 @@ export class AuthService {
         provider: savedUser.provider,
       };
     }
-    return ResponseDetail.ok({
-      msg: 'Login successful',
-      token: await this.generateToken(payload),
-    })
+    return {
+      ...await this.generateToken(payload),
+    }
   }
 
-  async createAccount(data: CreateAccountDto): Promise<ResponseMsg> {
+  async createAccount(data: CreateAccountDto): Promise<void> {
     const roleId = data.role_id ?? 1;
     if (roleId > 3 || roleId < 1) {
       throw new Error('ROLE_ID must be between 1 and 3');
@@ -205,8 +199,6 @@ export class AuthService {
     await this.userRepository.update(savedAccount.id, {
       qr_code: qrCode.data?.url,
     });
-
-    return ResponseMsg.ok('Create account successfully');
   }
   async generateToken(payload: JWTUserType):Promise<{access_token: string, refresh_token: string}> {
     const access_token = this.jwtService.sign(payload, {
@@ -235,7 +227,7 @@ export class AuthService {
     
   }
 
-  async refreshToken(data: RefreshTokenDto) : Promise<ResponseDetail<{access_token: string}>> {
+  async refreshToken(data: RefreshTokenDto) : Promise<{access_token: string}> {
     if (!data.refresh_token) {
       throw new UnauthorizedException('Refresh token is required');
     }
@@ -278,42 +270,40 @@ export class AuthService {
       expiresIn: this.configService.get<string>('jwt.expiresIn'),
     });
 
-    return ResponseDetail.ok({ access_token });
+    return { access_token };
   }
 
-  async logout(user: JWTUserType): Promise<ResponseMsg> {
+  async logout(user: JWTUserType): Promise<void> {
     const redisKey = `user-${user.account_id}`;
 
     const existed = await this.redisClient.get(redisKey);
 
     if (!existed) {
-      return ResponseMsg.ok('Already logged out');
+      throw new UnauthorizedException('User is not logged in');
     }
 
     await this.redisClient.del(redisKey);
 
-    return ResponseMsg.ok('Logout successful');
+
   }
 
   private generateCode(): string {
     const otpCode = randomInt(100000, 999999).toString();
     return otpCode;
   }
-  async sendOtp(data: SendOtpDto): Promise<ResponseMsg> {
+  async sendOtp(data: SendOtpDto): Promise<void> {
     const randomCode = this.generateCode();
     await this.mailService.sendOtp(data.email, randomCode);
     await this.redisClient.set(`otp-${data.email}`, randomCode, 'EX', 300);
-    return ResponseMsg.ok('Send OTP successfully');
   }
-  async verifyEmail(data: VerifyOtpDto): Promise<ResponseMsg> {
+  async verifyEmail(data: VerifyOtpDto): Promise<void> {
     const checkOtp = await this.redisClient.get(`otp:${data.email}`);
     if (!checkOtp || checkOtp !== data.otp) {
       throw new ForbiddenException('Invalid OTP');
     }
     await this.redisClient.del(`otp:${data.email}`);
-    return ResponseMsg.ok('Verify email successfully');
   }
-  async resetPassword(data: ResetPasswordDto): Promise<ResponseMsg> {
+  async resetPassword(data: ResetPasswordDto): Promise<void> {
     // check user
     const user = await this.userRepository.findOne({
       where: { email: data.email },
@@ -324,6 +314,5 @@ export class AuthService {
     const newPasswordHash = await hashPassword(data.new_password);
     user.password = newPasswordHash;
     await this.userRepository.save(user);
-    return ResponseMsg.ok('Reset password successfully');
   }
 }

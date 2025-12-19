@@ -1,15 +1,14 @@
+import { applySorting } from '@common/pagination/apply_sort';
+import { applyCommonFilters } from '@common/pagination/applyCommonFilters';
+import { applyPagination } from '@common/pagination/applyPagination';
+import { HistoryScorePaginationDto } from '@common/pagination/dto/historyScore/historyScorePagination.dto';
+import { historyScoreFieldMapping } from '@common/pagination/fillters/historyScore-filed-mapping';
+import { buildPaginationResponse } from '@common/pagination/pagination-response';
+import { ResponseDetail } from '@common/response/response-detail-create-update';
+import { ResponseList } from '@common/response/response-list';
+import { HistoryScore } from '@database/entities/order/history_score';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { applySorting } from 'src/common/pagination/apply_sort';
-import { applyCommonFilters } from 'src/common/pagination/applyCommonFilters';
-import { applyPagination } from 'src/common/pagination/applyPagination';
-import { HistoryScorePaginationDto } from 'src/common/pagination/dto/historyScore/historyScorePagination.dto';
-import { historyScoreFieldMapping } from 'src/common/pagination/fillters/historyScore-filed-mapping';
-import { buildPaginationResponse } from 'src/common/pagination/pagination-response';
-import { ResponseDetail } from 'src/common/response/response-detail-create-update';
-import { ResponseList } from 'src/common/response/response-list';
-import { JWTUserType } from 'src/common/utils/type';
-import { HistoryScore } from 'src/database/entities/order/history_score';
 import { Repository } from 'typeorm/repository/Repository';
 
 @Injectable()

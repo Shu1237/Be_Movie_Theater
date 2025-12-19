@@ -1,3 +1,9 @@
+import { GoogleAuthGuard } from '@common/guards/google.guard';
+import { JwtAuthGuard } from '@common/guards/jwt.guard';
+import { LocalGuard } from '@common/guards/local.guard';
+import { SendOtpDto } from '@common/mail/dto/sendEmail.dto';
+import { VerifyOtpDto } from '@common/mail/dto/verifyOtp.dto';
+import { JWTUserType, GoogleUserType } from '@common/utils/type';
 import {
   Body,
   Controller,
@@ -14,18 +20,11 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
-import { RefreshTokenDto } from './dtos/RefreshToken.dto';
-import { RefreshGuard } from 'src/common/guards/refresh-token.guard';
-import { LoginDto } from './dtos/Login.dto';
-import { LocalGuard } from 'src/common/guards/local.guard';
-import { GoogleUserType, JWTUserType } from 'src/common/utils/type';
 import { CreateAccountDto } from './dtos/CreateAccount.dto';
-import { ResponseMsg } from 'src/common/response/response-message';
-import { VerifyOtpDto } from 'src/common/mail/dto/verifyOtp.dto';
+import { LoginDto } from './dtos/Login.dto';
+import { RefreshTokenDto } from './dtos/RefreshToken.dto';
 import { ResetPasswordDto } from './dtos/resetPassword.dto';
-import { SendOtpDto } from 'src/common/mail/dto/sendEmail.dto';
-import { GoogleAuthGuard } from 'src/common/guards/google.guard';
+
 
 @ApiTags('Auth')
 @Controller('auth')

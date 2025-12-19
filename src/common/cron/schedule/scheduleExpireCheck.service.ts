@@ -1,9 +1,9 @@
+import { StatusSeat } from '@common/enums/status_seat.enum';
+import { Schedule } from '@database/entities/cinema/schedule';
+import { ScheduleSeat } from '@database/entities/cinema/schedule_seat';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
-import { StatusSeat } from 'src/common/enums/status_seat.enum';
-import { Schedule } from 'src/database/entities/cinema/schedule';
-import { ScheduleSeat } from 'src/database/entities/cinema/schedule_seat';
 import { Repository, LessThan } from 'typeorm';
 
 @Injectable()

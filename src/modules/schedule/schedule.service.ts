@@ -1,21 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { applyCommonFilters } from '@common/pagination/applyCommonFilters';
+import { applyPagination } from '@common/pagination/applyPagination';
+import { SchedulePaginationDto } from '@common/pagination/dto/shedule/schedulePagination.dto';
+import { scheduleFieldMapping } from '@common/pagination/fillters/scheduleFieldMapping';
+import { buildPaginationResponse } from '@common/pagination/pagination-response';
+import { ISchedule } from '@common/utils/type';
+import { CinemaRoom } from '@database/entities/cinema/cinema-room';
+import { Movie } from '@database/entities/cinema/movie';
+import { Schedule } from '@database/entities/cinema/schedule';
+import { Version } from '@database/entities/cinema/version';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Schedule } from 'src/database/entities/cinema/schedule';
 import { Repository } from 'typeorm';
-import { UpdateScheduleDto } from './dto/update-schedule.dto';
-import { Movie } from 'src/database/entities/cinema/movie';
-import { CinemaRoom } from 'src/database/entities/cinema/cinema-room';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
-import { ISchedule } from 'src/common/utils/type';
-import { NotFoundException } from 'src/common/exceptions/not-found.exception';
-import { Version } from 'src/database/entities/cinema/version';
-import { BadRequestException } from 'src/common/exceptions/bad-request.exception';
-import { SchedulePaginationDto } from 'src/common/pagination/dto/shedule/schedulePagination.dto';
-import { applyCommonFilters } from 'src/common/pagination/applyCommonFilters';
-import { scheduleFieldMapping } from 'src/common/pagination/fillters/scheduleFieldMapping';
-import { applySorting } from 'src/common/pagination/apply_sort';
-import { applyPagination } from 'src/common/pagination/applyPagination';
-import { buildPaginationResponse } from 'src/common/pagination/pagination-response';
+import { UpdateScheduleDto } from './dto/update-schedule.dto';
+
 @Injectable()
 export class ScheduleService {
   constructor(
@@ -153,13 +151,13 @@ export class ScheduleService {
       'version.id',
       'cinemaRoom.cinema_room_name',
     ];
-    applySorting(
-      qb,
-      fillters.sortBy,
-      fillters.sortOrder,
-      allowedFields,
-      'schedule.id',
-    );
+    // applySorting(
+    //   qb,
+    //   fillters.sortBy,
+    //   fillters.sortOrder,
+    //   allowedFields,
+    //   'schedule.id',
+    // );
 
     applyPagination(qb, {
       page: fillters.page,

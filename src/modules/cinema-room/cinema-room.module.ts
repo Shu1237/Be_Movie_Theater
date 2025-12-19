@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { CinemaRoomService } from './cinema-room.service';
 import { CinemaRoomController } from './cinema-room.controller';
-import { CinemaRoom } from 'src/database/entities/cinema/cinema-room';
+
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CinemaRoom } from '@database/entities/cinema/cinema-room';
 
 
 @Module({

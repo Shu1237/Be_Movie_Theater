@@ -1,11 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaymentMethod } from 'src/database/entities/order/payment-method';
 import { Repository } from 'typeorm';
 import { CreatePaymentMethodDto } from './dto/create-payment-method.dto';
 import { UpdatePaymentMethodDto } from './dto/update-payment-method.dto';
-import { NotFoundException } from 'src/common/exceptions/not-found.exception';
-import { BadRequestException } from 'src/common/exceptions/bad-request.exception';
+import { ResponseDetail } from '@common/response/response-detail-create-update';
+import { ResponseMsg } from '@common/response/response-message';
+import { PaymentMethod } from '@database/entities/order/payment-method';
+
 
 @Injectable()
 export class PaymentMethodService {
@@ -14,7 +15,7 @@ export class PaymentMethodService {
     private readonly paymentMethodRepository: Repository<PaymentMethod>,
   ) {}
 
-  async create(createPaymentMethodDto: CreatePaymentMethodDto) {
+  async create(createPaymentMethodDto: CreatePaymentMethodDto) :Promise<ResponseDetail<PaymentMethod>> {
     const exists = await this.paymentMethodRepository.findOne({
       where: { name: createPaymentMethodDto.name, is_deleted: false },
     });
@@ -26,45 +27,45 @@ export class PaymentMethodService {
     const paymentMethod = this.paymentMethodRepository.create(
       createPaymentMethodDto,
     );
-    await this.paymentMethodRepository.save(paymentMethod);
-    return { msg: 'Payment method created successfully' };
+    const savedPaymentMethod = await this.paymentMethodRepository.save(paymentMethod);
+    return ResponseDetail.ok(savedPaymentMethod)
   }
 
   async findAll() {
     return this.paymentMethodRepository.find({ where: { is_deleted: false } });
   }
 
-  async findOne(id: number) {
+  async findOne(id: number) : Promise<ResponseDetail<PaymentMethod>> {
     const paymentMethod = await this.paymentMethodRepository.findOne({
       where: { id, is_deleted: false },
     });
     if (!paymentMethod) {
       throw new NotFoundException(`Payment method with ID ${id} not found`);
     }
-    return paymentMethod;
+    return ResponseDetail.ok(paymentMethod)
   }
 
-  async update(id: number, updatePaymentMethodDto: UpdatePaymentMethodDto) {
+  async update(id: number, updatePaymentMethodDto: UpdatePaymentMethodDto) : Promise<ResponseDetail<PaymentMethod | null>> {
     const paymentMethod = await this.paymentMethodRepository.findOne({
       where: { id, is_deleted: false },
     });
     if (!paymentMethod) {
       throw new NotFoundException(`Payment method with ID ${id} not found`);
     }
-    Object.assign(paymentMethod, updatePaymentMethodDto);
-    await this.paymentMethodRepository.save(paymentMethod);
-    return { msg: 'Payment method updated successfully' };
+     await this.paymentMethodRepository.update(id, updatePaymentMethodDto);
+    const updatedPaymentMethod = await this.paymentMethodRepository.findOne({ where: { id } });
+    return ResponseDetail.ok(updatedPaymentMethod)
   }
 
-  async remove(id: number) {
+  async remove(id: number) :Promise<ResponseMsg> {
     const result = await this.paymentMethodRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`Payment method with ID ${id} not found`);
     }
-    return { msg: 'Payment method deleted successfully' };
+    return ResponseMsg.ok('Payment method deleted successfully');
   }
 
-  async softDelete(id: number) {
+  async softDelete(id: number) : Promise<ResponseMsg> {
     const paymentMethod = await this.paymentMethodRepository.findOne({
       where: { id, is_deleted: false },
     });
@@ -73,10 +74,10 @@ export class PaymentMethodService {
     }
     paymentMethod.is_deleted = true;
     await this.paymentMethodRepository.save(paymentMethod);
-    return { msg: 'Payment method soft deleted successfully' };
+    return ResponseMsg.ok('Payment method soft deleted successfully');
   }
 
-  async restore(id: number): Promise<{ msg: string }> {
+  async restore(id: number): Promise<ResponseMsg> {
     const paymentMethod = await this.paymentMethodRepository.findOne({
       where: { id },
     });
@@ -90,6 +91,6 @@ export class PaymentMethodService {
     }
     paymentMethod.is_deleted = false;
     await this.paymentMethodRepository.save(paymentMethod);
-    return { msg: 'Payment method restored successfully' };
+    return ResponseMsg.ok('Payment method restored successfully');
   }
 }

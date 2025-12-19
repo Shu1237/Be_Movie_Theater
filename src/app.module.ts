@@ -8,7 +8,6 @@ import { allEntities } from './database';
 
 // Modules
 import { AuthModule } from './modules/auth/auth.module';
-import { UserModule } from './modules/member/user.module';
 import { MovieModule } from './modules/movie/movie.module';
 import { OrderModule } from './modules/order/order.module';
 import { PromotionModule } from './modules/promotion/promotion.module';
@@ -27,6 +26,7 @@ import { HistoryScoreModule } from './modules/historyScore/historyScore.module';
 import { PaymentMethodModule } from './modules/payment-method/payment-method.module';
 import { OverviewModule } from './modules/overview/overview.module';
 import { RedisModule } from './common/redis/redis.module';
+import { UserModule } from '@modules/user/user.module';
 
 @Module({
   imports: [

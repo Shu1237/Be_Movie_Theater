@@ -1,11 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback, Profile } from 'passport-google-oauth20';
 import { AuthService } from '../auth.service';
-import { GoogleUserType } from 'src/common/utils/type';
 import { ConfigService } from '@nestjs/config';
-import { InternalServerErrorException } from 'src/common/exceptions/internal-server-error.exception';
-import { Gender } from 'src/common/enums/gender.enum';
+import { Gender } from '@common/enums/gender.enum';
+
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {

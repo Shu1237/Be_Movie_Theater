@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { SeatType } from 'src/database/entities/cinema/seat-type';
 import { CreateSeatTypeDto } from './dto/create-seat-type.dto';
 import { UpdateSeatTypeDto } from './dto/update-seat-type.dto';
-import { NotFoundException } from 'src/common/exceptions/not-found.exception';
+import { SeatType } from '@database/entities/cinema/seat-type';
+
 
 @Injectable()
 export class SeatTypeService {

@@ -1,23 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { NotFoundException } from 'src/common/exceptions/not-found.exception';
-import { Product } from 'src/database/entities/item/product';
 import { Repository, In } from 'typeorm';
 import { CreateProductDto } from './dto/createProdcut.dto';
-import { Drink } from 'src/database/entities/item/drink';
-import { Combo } from 'src/database/entities/item/combo';
-import { Food } from 'src/database/entities/item/food';
 import { UpdateProductDto } from './dto/updateProduct.dto';
+import { ProductTypeEnum } from '@common/enums/product.enum';
+import { applyCommonFilters } from '@common/pagination/applyCommonFilters';
+import { applyPagination } from '@common/pagination/applyPagination';
+import { ProductPaginationDto } from '@common/pagination/dto/product/productPagination.dto';
+import { productFieldMapping } from '@common/pagination/fillters/product-filed-mapping';
+import { buildPaginationResponse } from '@common/pagination/pagination-response';
+import { Combo } from '@database/entities/item/combo';
+import { Drink } from '@database/entities/item/drink';
+import { Food } from '@database/entities/item/food';
+import { Product } from '@database/entities/item/product';
 
 
-import { ProductPaginationDto } from 'src/common/pagination/dto/product/productPagination.dto';
-import { applyCommonFilters } from 'src/common/pagination/applyCommonFilters';
-import { productFieldMapping } from 'src/common/pagination/fillters/product-filed-mapping';
-import { applySorting } from 'src/common/pagination/apply_sort';
-import { applyPagination } from 'src/common/pagination/applyPagination';
-import { buildPaginationResponse } from 'src/common/pagination/pagination-response';
-import { ProductTypeEnum } from 'src/common/enums/product.enum';
-import { BadRequestException } from 'src/common/exceptions/bad-request.exception';
+
 
 
 @Injectable()
@@ -57,13 +55,13 @@ export class ProductService {
       'product.type',
       'product.category',
     ];
-    applySorting(
-      qb,
-      fillters.sortBy,
-      fillters.sortOrder,
-      allowedFields,
-      'product.name',
-    );
+    // applySorting(
+    //   qb,
+    //   fillters.sortBy,
+    //   fillters.sortOrder,
+    //   allowedFields,
+    //   'product.name',
+    // );
     applyPagination(qb, {
       page: fillters.page,
       take: fillters.take,

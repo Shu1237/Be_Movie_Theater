@@ -10,7 +10,8 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { AudienceType } from 'src/common/enums/audience_type.enum';
+import { AudienceType } from '@common/enums/audience_type.enum';
+
 
 class SeatInfoDto {
   @ApiProperty({ example: 'abc123', description: 'Seat ID' })

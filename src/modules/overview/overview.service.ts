@@ -1,30 +1,23 @@
+import { StatusOrder } from '@common/enums/status-order.enum';
+import { applySorting } from '@common/pagination/apply_sort';
+import { applyCommonFilters } from '@common/pagination/applyCommonFilters';
+import { applyPagination } from '@common/pagination/applyPagination';
+import { DailyReportDto } from '@common/pagination/dto/dailyReport/dailyReport.dto';
+import { dailyReportFieldMapping } from '@common/pagination/fillters/daily-report-mapping';
+import { buildPaginationResponse } from '@common/pagination/pagination-response';
+import { Movie } from '@database/entities/cinema/movie';
+import { Schedule } from '@database/entities/cinema/schedule';
+import { DailyTransactionSummary } from '@database/entities/order/daily_transaction_summary';
+import { Order } from '@database/entities/order/order';
+import { OrderExtra } from '@database/entities/order/order-extra';
+import { Ticket } from '@database/entities/order/ticket';
+import { TicketType } from '@database/entities/order/ticket-type';
+import { User } from '@database/entities/user/user';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Movie } from 'src/database/entities/cinema/movie';
-import { Order } from 'src/database/entities/order/order';
-import { Ticket } from 'src/database/entities/order/ticket';
-import { User } from 'src/database/entities/user/user';
-import { TicketType } from 'src/database/entities/order/ticket-type';
-import { OrderExtra } from 'src/database/entities/order/order-extra';
-import { Schedule } from 'src/database/entities/cinema/schedule';
 import { Repository } from 'typeorm';
-import {
-  OverviewResponseDto,
-  TicketTypeSaleDto,
-  BestSellingComboDto,
-  TimeSlotReportDto,
-  PeakHoursRevenueDto,
-  TopMovieDto,
-  TopCustomerDto,
-} from './dtos/overview-response.dto';
-import { StatusOrder } from 'src/common/enums/status-order.enum';
-import { DailyTransactionSummary } from 'src/database/entities/order/daily_transaction_summary';
-import { applyCommonFilters } from 'src/common/pagination/applyCommonFilters';
-import { DailyReportDto } from 'src/common/pagination/dto/dailyReport/dailyReport.dto';
-import { dailyReportFieldMapping } from 'src/common/pagination/fillters/daily-report-mapping';
-import { applyPagination } from 'src/common/pagination/applyPagination';
-import { applySorting } from 'src/common/pagination/apply_sort';
-import { buildPaginationResponse } from 'src/common/pagination/pagination-response';
+import { OverviewResponseDto, TicketTypeSaleDto, BestSellingComboDto, TimeSlotReportDto, PeakHoursRevenueDto, TopMovieDto, TopCustomerDto } from './dtos/overview-response.dto';
+
 
 @Injectable()
 export class OverviewService {

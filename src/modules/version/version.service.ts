@@ -1,17 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateVersionDto } from './dto/create-version.dto';
 import { UpdateVersionDto } from './dto/update-version.dto';
-import { Version } from 'src/database/entities/cinema/version';
-import { BadRequestException } from 'src/common/exceptions/bad-request.exception';
-import { NotFoundException } from 'src/common/exceptions/not-found.exception';
-import { VersionPaginationDto } from 'src/common/pagination/dto/version/versionPagination.dto';
-import { applyCommonFilters } from 'src/common/pagination/applyCommonFilters';
-import { versionFieldMapping } from 'src/common/pagination/fillters/versionFieldMapping';
-import { applySorting } from 'src/common/pagination/apply_sort';
-import { applyPagination } from 'src/common/pagination/applyPagination';
-import { buildPaginationResponse } from 'src/common/pagination/pagination-response';
+import { applySorting } from '@common/pagination/apply_sort';
+import { applyCommonFilters } from '@common/pagination/applyCommonFilters';
+import { applyPagination } from '@common/pagination/applyPagination';
+import { VersionPaginationDto } from '@common/pagination/dto/version/versionPagination.dto';
+import { versionFieldMapping } from '@common/pagination/fillters/versionFieldMapping';
+import { buildPaginationResponse } from '@common/pagination/pagination-response';
+import { ResponseDetail } from '@common/response/response-detail-create-update';
+import { ResponseList } from '@common/response/response-list';
+import { ResponseMsg } from '@common/response/response-message';
+import { Version } from '@database/entities/cinema/version';
+
 
 @Injectable()
 export class VersionService {
@@ -19,15 +21,10 @@ export class VersionService {
     @InjectRepository(Version)
     private readonly versionRepository: Repository<Version>,
   ) {}
-  async getAllVersionsUser(): Promise<Version[]> {
-    return await this.versionRepository.find({
-      where: { is_deleted: false },
-    });
-  }
-  async create(
-    createVersionDto: CreateVersionDto,
-  ): Promise<{ message: string }> {
 
+  async createVersion(
+    createVersionDto: CreateVersionDto,
+  ): Promise<ResponseDetail<Version>> {
     const existingVersion = await this.versionRepository.findOne({
       where: { name: createVersionDto.name },
     });
@@ -38,89 +35,99 @@ export class VersionService {
     }
 
     const version = this.versionRepository.create(createVersionDto);
-    await this.versionRepository.save(version);
-    return { message: 'Version created successfully' };
+    const savedVersion = await this.versionRepository.save(version);
+    return ResponseDetail.ok(savedVersion);
   }
-  async findAll(fillters: VersionPaginationDto) : Promise<ReturnType <typeof buildPaginationResponse>> {
+  async findAllVersions(
+    filters: VersionPaginationDto,
+  ): Promise<ResponseList<Version>> {
     const qb = this.versionRepository.createQueryBuilder('version');
 
-    applyCommonFilters(qb, fillters, versionFieldMapping);
+    applyCommonFilters(qb, filters, versionFieldMapping);
     const allowedFields = ['version.name', 'version.id'];
     applySorting(
       qb,
-      fillters.sortBy,
-      fillters.sortOrder,
+      filters.sortBy,
+      filters.sortOrder,
       allowedFields,
       'version.id',
     );
     applyPagination(qb, {
-      page: fillters.page,
-      take: fillters.take,
+      page: filters.page,
+      take: filters.take,
     });
     const [versions, total] = await qb.getManyAndCount();
-    const counts = await this.versionRepository
+    const counts = (await this.versionRepository
       .createQueryBuilder('version')
       .select([
         `SUM(CASE WHEN version.is_deleted = false THEN 1 ELSE 0 END) AS activeCount`,
         `SUM(CASE WHEN version.is_deleted = true THEN 1 ELSE 0 END) AS deletedCount`,
       ])
-      .getRawOne() || { activeCount: 0, deletedCount: 0 };
-    const activeCount =  Number(counts.activeCount) || 0;
-    const deletedCount =  Number(counts.deletedCount) || 0;
-    return buildPaginationResponse(versions, {
-      total,
-      page: fillters.page,
-      take: fillters.take,
-      activeCount,
-      deletedCount,
-    });
+      .getRawOne()) || { activeCount: 0, deletedCount: 0 };
+    const activeCount = Number(counts.activeCount) || 0;
+    const deletedCount = Number(counts.deletedCount) || 0;
+    return ResponseList.ok(
+      buildPaginationResponse(versions, {
+        total,
+        take: filters.take,
+        page: filters.page,
+        activeCount,
+        deletedCount,
+      }),
+    );
   }
 
-  async findOne(id: number): Promise<Version> {
+  async findOne(id: number): Promise<ResponseDetail<Version>> {
     const version = await this.versionRepository.findOne({ where: { id } });
     if (!version) {
       throw new NotFoundException(`Version with ID ${id} not found`);
     }
-    return version;
+    return ResponseDetail.ok(version);
   }
 
-  async update(
+  async updateVersion(
     id: number,
-    updateVersionDto: UpdateVersionDto,
+    dto: UpdateVersionDto,
   ): Promise<{ message: string }> {
-    const version = await this.findOne(id);
-
-
-    if (updateVersionDto.name) {
-      const existingVersion = await this.versionRepository.findOne({
-        where: { name: updateVersionDto.name },
+    try {
+      const version = await this.versionRepository.preload({
+        id,
+        ...dto,
+        name: dto.name?.trim(),
       });
-      if (existingVersion && existingVersion.id !== id) {
+
+      if (!version) {
+        throw new NotFoundException(`Version with ID ${id} not found`);
+      }
+
+      await this.versionRepository.save(version);
+      return { message: 'Version updated successfully' };
+    } catch (error) {
+      if (
+        error.code === 'ER_DUP_ENTRY' || // MySQL
+        error.code === '23505' // PostgreSQL
+      ) {
         throw new BadRequestException(
-          `Version with name "${updateVersionDto.name}" already exists.`,
+          `Version with name "${dto.name}" already exists.`,
         );
       }
+      throw error;
     }
-
-    Object.assign(version, updateVersionDto);
-    await this.versionRepository.save(version);
-    return { message: 'Version updated successfully' };
   }
-  async softDeleteVersion(
-    id: number,
-  ): Promise<{ msg: string; version: Version }> {
+
+  async softDeleteVersion(id: number): Promise<ResponseMsg> {
     const version = await this.versionRepository.findOne({ where: { id } });
     if (!version) {
       throw new NotFoundException(`Version with ID ${id} not found`);
     }
 
-    version.is_deleted = true; 
+    version.is_deleted = true;
     await this.versionRepository.save(version);
 
-    return { msg: 'Version soft-deleted successfully', version };
+    return ResponseMsg.ok('Version soft-deleted successfully');
   }
 
-  async restoreVersion(id: number): Promise<{ msg: string; version: Version }> {
+  async restoreVersion(id: number): Promise<ResponseMsg> {
     const version = await this.versionRepository.findOne({ where: { id } });
     if (!version) {
       throw new NotFoundException(`Version with ID ${id} not found`);
@@ -132,12 +139,17 @@ export class VersionService {
     }
     version.is_deleted = false;
     await this.versionRepository.save(version);
-    return { msg: 'Version restored successfully', version };
+    return ResponseMsg.ok('Version restored successfully');
   }
 
-  async remove(id: number): Promise<{ msg: string }> {
-    const version = await this.findOne(id);
-    await this.versionRepository.remove(version);
-    return { msg: 'Version deleted successfully' };
+  async removeVersion(id: number): Promise<ResponseMsg> {
+    const res = await this.findOne(id);
+
+    if (!res.data) {
+      throw new NotFoundException(`Version with ID ${id} not found`);
+    }
+
+    await this.versionRepository.remove(res.data);
+    return ResponseMsg.ok('Version deleted successfully');
   }
 }

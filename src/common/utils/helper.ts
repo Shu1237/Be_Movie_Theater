@@ -1,15 +1,14 @@
 import * as bcrypt from 'bcrypt';
-import { Stripe } from 'stripe';
-import { OrderBillType, ProductType } from './type';
+
+import { OrderBillType } from './type';
 import {
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { TicketType } from 'src/database/entities/order/ticket-type';
-import { ScheduleSeat } from 'src/database/entities/cinema/schedule_seat';
-import { Product } from 'src/database/entities/item/product';
-import { ProductTypeEnum } from 'src/common/enums/product.enum';
-import { Combo } from 'src/database/entities/item/combo';
+import { ProductTypeEnum } from '@common/enums/product.enum';
+import { Combo } from '@database/entities/item/combo';
+import { Product } from '@database/entities/item/product';
+
 
 const SALT_ROUNDS = 10;
 
