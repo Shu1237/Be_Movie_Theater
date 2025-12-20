@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
-export class CreateGerneDto {
+export class CreateGenreDto {
   @ApiProperty({
     description: 'The content or description of the movie',
   })

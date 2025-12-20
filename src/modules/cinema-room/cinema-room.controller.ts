@@ -36,7 +36,7 @@ export class CinemaRoomController {
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
   @ApiQuery({ name: 'is_deleted', required: false, type: Boolean, example: false })
-  async findAll(@Query() query: CinemaRoomPaginationDto) {
+  async getAll(@Query() query: CinemaRoomPaginationDto) {
     const { page = 1, take = 10, ...restFilters } = query;
     return this.cinemaRoomService.findAllCinemaRooms({
       page,
@@ -48,7 +48,7 @@ export class CinemaRoomController {
   // GET - get cinema room by ID
   @Get(':id')
   @ApiOperation({ summary: 'Get cinema room by ID' })
-  async findOne(@Param('id') id: number) {
+  async getById(@Param('id', ParseIntPipe) id: number) {
     return await this.cinemaRoomService.findCinemaRoomById(id);
   }
 
@@ -67,7 +67,7 @@ export class CinemaRoomController {
   @UseGuards(RolesGuard)
   @ApiOperation({ summary: 'Update cinema room by ID (admin, employee only)' })
   async update(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateCinemaRoomDto: UpdateCinemaRoomDto,
   ) {
     return await this.cinemaRoomService.updateCinemaRoom(id, updateCinemaRoomDto);
@@ -78,7 +78,7 @@ export class CinemaRoomController {
   @UseGuards(RolesGuard)
   @Patch(':id/soft-delete')
   @ApiOperation({ summary: 'Soft delete a cinema room (admin, employee only)' })
-  async softDeleteCinemaRoom(
+  async softDelete(
     @Param('id', ParseIntPipe) id: number,
   ) {
     return await this.cinemaRoomService.softDeleteCinemaRoom(id);
@@ -91,7 +91,7 @@ export class CinemaRoomController {
   @ApiOperation({
     summary: 'Restore a soft-deleted cinema room (admin, employee only)',
   })
-  async restoreCinemaRoom(@Param('id', ParseIntPipe) id: number) {
+  async restore(@Param('id', ParseIntPipe) id: number) {
     return await this.cinemaRoomService.restoreCinemaRoom(id);
   }
 
@@ -100,7 +100,7 @@ export class CinemaRoomController {
   @UseGuards(RolesGuard)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete cinema room by ID (admin, employee only)' })
-  async remove(@Param('id') id: number) {
+  async remove(@Param('id', ParseIntPipe) id: number) {
     return await this.cinemaRoomService.removeCinemaRoom(id);
   }
 }

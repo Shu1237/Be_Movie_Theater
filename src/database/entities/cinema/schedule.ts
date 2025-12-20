@@ -35,7 +35,7 @@ export class Schedule {
   @JoinColumn({ name: 'movie_id' })
   movie: Movie;
 
-  @ManyToOne(() => Version, { eager: true }) // Liên kết với Version
+  @ManyToOne(() => Version, { eager: true }) 
   @JoinColumn({ name: 'version_id' })
   version: Version;
 

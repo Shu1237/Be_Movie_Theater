@@ -37,7 +37,7 @@ export class TicketService {
         },
         version: {
           id: ticket.schedule.version.id,
-          name: ticket.schedule.version.name,
+          version_name: ticket.schedule.version.version_name,
         },
         cinemaRoom: {
           id: ticket.schedule.cinemaRoom.id,

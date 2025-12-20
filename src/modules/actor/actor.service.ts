@@ -105,8 +105,7 @@ export class ActorService {
       );
     }
 
-    actor.is_deleted = true;
-    await this.actorRepository.save(actor);
+    await this.actorRepository.update(id, { is_deleted: true });
   }
 
 
@@ -120,8 +119,7 @@ export class ActorService {
       );
     }
 
-    actor.is_deleted = false;
-    await this.actorRepository.save(actor);
+    await this.actorRepository.update(id, { is_deleted: false });
   }
 
 

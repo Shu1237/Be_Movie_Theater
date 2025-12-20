@@ -4,7 +4,7 @@ import { Transform } from 'class-transformer';
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
-export class GernePaginationDto extends BasePaginationDto {
+export class GenrePaginationDto extends BasePaginationDto {
   @ApiPropertyOptional({
     description: 'Search term to filter results',
     example: 'name',

@@ -1,14 +1,16 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { GerneService } from './gerne.service';
-import { GerneController } from './gerne.controller';
-import { Gerne } from '@database/entities/cinema/gerne';
+
+import { GenreController } from './gerne.controller';
+
 import { Movie } from '@database/entities/cinema/movie';
+import { Genre } from '@database/entities/cinema/genre';
+import { GenreService } from './gerne.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Gerne, Movie])],
-  controllers: [GerneController],
-  providers: [GerneService],
-  exports: [GerneService],
+  imports: [TypeOrmModule.forFeature([Genre, Movie])],
+  controllers: [GenreController],
+  providers: [GenreService],
+  exports: [GenreService],
 })
-export class GerneModule {}
+export class GenreModule {}

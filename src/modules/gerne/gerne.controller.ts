@@ -12,20 +12,22 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
-import { GerneService } from './gerne.service';
+
 import { Roles } from '@common/decorator/roles.decorator';
 import { Role } from '@common/enums/roles.enum';
 import { JwtAuthGuard } from '@common/guards/jwt.guard';
 import { RolesGuard } from '@common/guards/roles.guard';
-import { GernePaginationDto } from '@common/pagination/dto/gerne/gerne.dto';
-import { CreateGerneDto } from './dtos/createGerne';
-import { UpdateGerneDto } from './dtos/updateGerne';
+
+import { CreateGenreDto  } from './dtos/createGerne';
+import { UpdateGenreDto  } from './dtos/updateGerne';
+import { GenreService } from './gerne.service';
+import { GenrePaginationDto } from '@common/pagination/dto/gerne/gerne.dto';
 
 
 
-@Controller('gernes')
-export class GerneController {
-  constructor(private readonly gerneService: GerneService) { }
+@Controller('genres')
+export class GenreController {
+  constructor(private readonly genreService: GenreService) { }
 
 
 
@@ -37,10 +39,10 @@ export class GerneController {
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
   @ApiBearerAuth()
-  async findAllGernes(@Query() query: GernePaginationDto) {
+  async getAll(@Query() query: GenrePaginationDto) {
     const { page = 1, take = 10, ...restFilters } = query;
 
-    return await this.gerneService.findAllGernes({
+    return await this.genreService.findAllGenres({
       page,
       take: Math.min(take, 100),
       ...restFilters,
@@ -50,8 +52,8 @@ export class GerneController {
   // GET - Get genre by ID
   @Get(':id')
   @ApiOperation({ summary: 'Get genre by ID' })
-  async findGerneById(@Param('id', ParseIntPipe) id: number) {
-    return await this.gerneService.findGerneById(id);
+  async getById(@Param('id', ParseIntPipe) id: number) {
+    return await this.genreService.findGenreById(id);
   }
 
   // POST - Create a new genre
@@ -60,8 +62,8 @@ export class GerneController {
   @Post()
   @ApiOperation({ summary: 'Create a new genre (admin, employee only)' })
   @ApiBearerAuth()
-  createGerne(@Body() createGerneDto: CreateGerneDto) {
-    return this.gerneService.createGerne(createGerneDto);
+  create(@Body() createGenreDto: CreateGenreDto) {
+    return this.genreService.createGenre(createGenreDto);
   }
 
   // PUT - Update genre by ID
@@ -70,11 +72,11 @@ export class GerneController {
   @Put(':id')
   @ApiOperation({ summary: 'Update genre by ID (admin, employee only)' })
   @ApiBearerAuth()
-  updateGerne(
+  update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateGerneDto: UpdateGerneDto,
+    @Body() updateGenreDto: UpdateGenreDto,
   ) {
-    return this.gerneService.updateGerne(id, updateGerneDto);
+    return this.genreService.updateGenre(id, updateGenreDto);
   }
 
   // PATCH - Soft delete genre
@@ -83,8 +85,8 @@ export class GerneController {
   @Patch(':id/soft-delete')
   @ApiOperation({ summary: 'Soft delete a genre (admin, employee only)' })
   @ApiBearerAuth()
-  softDeleteGerne(@Param('id', ParseIntPipe) id: number) {
-    return this.gerneService.softDeleteGerne(id);
+  softDelete(@Param('id', ParseIntPipe) id: number) {
+    return this.genreService.softDeleteGenre(id);
   }
 
   // DELETE - Restore soft-deleted genre
@@ -94,18 +96,19 @@ export class GerneController {
   @ApiOperation({
     summary: 'Restore a soft-deleted genre (admin, employee only)',
   })
-  async restoreGerne(@Param('id', ParseIntPipe) id: number) {
-    return await this.gerneService.restoreGerne(id);
+  async restore(@Param('id', ParseIntPipe) id: number) {
+    return await this.genreService.restoreGenre(id);
   }
 
   // DELETE - Delete genre by ID
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete genre by ID (admin only)' })
   @ApiBearerAuth()
-  async deleteGerne(
+  async remove(
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return await this.gerneService.deleteGerne(id);
+    return await this.genreService.deleteGenre(id);
   }
 }

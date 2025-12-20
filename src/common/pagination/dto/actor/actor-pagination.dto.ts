@@ -14,15 +14,27 @@ export class ActorPaginationDto extends BasePaginationDto {
 
   @ApiPropertyOptional({
     description: 'Field to sort by',
-    enum: ['actor.id', 'actor.name', 'actor.stage_name', 'actor.nationality', 'actor.gender'],
-    example: 'actor.id',
+    enum: [
+      'actor.id',
+      'actor.actor_name',
+      'actor.stage_name',
+      'actor.nationality',
+      'actor.gender',
+      'actor.created_at',
+    ],
+    example: 'actor.created_at',
   })
   @IsOptional()
-  @IsIn(['actor.id', 'actor.name', 'actor.stage_name', 'actor.nationality', 'actor.gender'])
-  sortBy?: 'actor.id' | 'actor.name' | 'actor.stage_name' | 'actor.nationality' | 'actor.gender' = 'actor.id';
+  @IsIn([
+    'actor.id',
+    'actor.actor_name',
+    'actor.stage_name',
+    'actor.nationality',
+    'actor.gender',
+    'actor.created_at',
+  ])
+  sortBy?= 'actor.created_at'
 
-
- 
   @IsOptional()
   @IsIn(['male', 'female'], {
     message: 'Gender must be male or female',

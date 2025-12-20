@@ -15,31 +15,23 @@ import {
 import { ActorService } from './actor.service';
 import { CreateActorDto } from './dtos/createActor.dto';
 import { UpdateActorDto } from './dtos/updateActor.dto';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { ActorPaginationDto } from '@common/pagination/dto/actor/actor-pagination.dto';
 import { Roles } from '@common/decorator/roles.decorator';
 import { Role } from '@common/enums/roles.enum';
 import { JwtAuthGuard } from '@common/guards/jwt.guard';
 import { RolesGuard } from '@common/guards/roles.guard';
 
-
-
 @Controller('actor')
 export class ActorController {
-  constructor(private readonly actorService: ActorService) { }
+  constructor(private readonly actorService: ActorService) {}
 
-
-
-  // GET - get list of actors 
+  // GET - get list of actors
   @Get()
   @ApiOperation({ summary: 'Get all actors ' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
-  async getAllActors(@Query() query: ActorPaginationDto) {
+  async getAll(@Query() query: ActorPaginationDto) {
     const { page = 1, take = 10, ...restFilters } = query;
     return await this.actorService.getAllActors({
       page,
@@ -51,7 +43,7 @@ export class ActorController {
   // GET - get actor by ID
   @Get(':id')
   @ApiOperation({ summary: 'Get actor by ID' })
-  async findActorById(@Param('id', ParseIntPipe) id: number) {
+  async getById(@Param('id', ParseIntPipe) id: number) {
     return await this.actorService.findActorById(id);
   }
 
@@ -61,7 +53,7 @@ export class ActorController {
   @Post()
   @ApiOperation({ summary: 'Create a new actor (admin, employee only)' })
   @ApiBearerAuth()
-  async createActor(@Body() createActorDto: CreateActorDto) {
+  async create(@Body() createActorDto: CreateActorDto) {
     return await this.actorService.createActor(createActorDto);
   }
 
@@ -71,11 +63,11 @@ export class ActorController {
   @Put(':id')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update actor details (admin, employee only)' })
-  async updateActor(
-    @Param('id') id: string,
+  async update(
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateActorDto: UpdateActorDto,
   ) {
-    return await this.actorService.updateActor(+id, updateActorDto);
+    return await this.actorService.updateActor(id, updateActorDto);
   }
 
   // PATCH - Soft delete actor
@@ -84,7 +76,7 @@ export class ActorController {
   @Patch(':id/soft-delete')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Soft delete an actor (admin, employee only)' })
-  async softDeleteActor(@Param('id', ParseIntPipe) id: number) {
+  async softDelete(@Param('id', ParseIntPipe) id: number) {
     return await this.actorService.softDeleteActor(id);
   }
 
@@ -96,7 +88,7 @@ export class ActorController {
   @ApiOperation({
     summary: 'Restore a soft-deleted actor (admin, employee only)',
   })
-  async restoreActor(@Param('id', ParseIntPipe) id: number) {
+  async restore(@Param('id', ParseIntPipe) id: number) {
     return await this.actorService.restoreActor(id);
   }
 
@@ -105,9 +97,10 @@ export class ActorController {
   @Roles(Role.ADMIN, Role.EMPLOYEE)
   @Delete(':id')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Permanently delete an actor (admin, employee only)' })
-  async removeActor(@Param('id') id: string) {
-    return await this.actorService.removeActor(+id);
+  @ApiOperation({
+    summary: 'Permanently delete an actor (admin, employee only)',
+  })
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return await this.actorService.removeActor(id);
   }
-
 }

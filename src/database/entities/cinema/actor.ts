@@ -17,7 +17,7 @@ export class Actor {
   id: number;
 
   @Column({ type: 'varchar', nullable: false, length: 100})
-  name: string;
+  actor_name: string;
 
   @Column({ type: 'varchar', nullable: true, length: 100 })
   stage_name?: string;

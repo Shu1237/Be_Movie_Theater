@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Seat } from './seat';
 import { Schedule } from './schedule';
 
@@ -12,11 +19,11 @@ export class CinemaRoom {
   @Column({ type: 'varchar', nullable: false, length: 100, unique: true })
   cinema_room_name: string;
 
-   @CreateDateColumn()
-    created_at: Date;
-  
-    @UpdateDateColumn()
-    updated_at: Date;
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 
   @OneToMany(() => Seat, (seat) => seat.cinemaRoom)
   seats: Seat[];

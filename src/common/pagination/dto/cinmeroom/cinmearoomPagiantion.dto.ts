@@ -1,4 +1,4 @@
-import { IsOptional, IsBoolean, IsString,   IsIn } from 'class-validator';
+import { IsOptional, IsBoolean, IsString, IsIn } from 'class-validator';
 
 import { BasePaginationDto } from '../basePagination.dto';
 import { Transform } from 'class-transformer';
@@ -13,16 +13,22 @@ export class CinemaRoomPaginationDto extends BasePaginationDto {
   @IsString()
   search?: string;
 
- @ApiPropertyOptional({
-    description: "Field to sort by",
-    enum: ["cinemaRoom.id", "cinemaRoom.cinema_room_name"],
-    example: "cinemaRoom.id",
+  @ApiPropertyOptional({
+    description: 'Field to sort by',
+    enum: [
+      'cinemaRoom.id',
+      'cinemaRoom.cinema_room_name',
+      'cinemaRoom.created_at',
+    ],
+    example: 'cinemaRoom.created_at',
   })
   @IsOptional()
-  @IsIn(["cinemaRoom.id", "cinemaRoom.cinema_room_name"])
-  sortBy?: "cinemaRoom.id" | "cinemaRoom.cinema_room_name" = "cinemaRoom.id";
-
-
+  @IsIn([
+    'cinemaRoom.id',
+    'cinemaRoom.cinema_room_name',
+    'cinemaRoom.created_at',
+  ])
+  sortBy? = 'cinemaRoom.created_at';
 
   @Transform(({ value }) => value === 'true' || value === true)
   @IsOptional()

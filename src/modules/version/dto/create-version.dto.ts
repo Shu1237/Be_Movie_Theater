@@ -8,5 +8,5 @@ export class CreateVersionDto {
     description: 'Version name',
     example: 'Version 1',
   })
-  name: string;
+  version_name: string;
 }

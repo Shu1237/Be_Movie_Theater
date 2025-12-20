@@ -1,23 +1,24 @@
-import { applySorting } from "@common/pagination/apply_sort";
-import { applyCommonFilters } from "@common/pagination/applyCommonFilters";
-import { applyPagination } from "@common/pagination/applyPagination";
-import { MoviePaginationDto } from "@common/pagination/dto/movie/moviePagination.dto";
-import { movieFieldMapping } from "@common/pagination/fillters/movieFieldMapping";
-import { buildPaginationResponse } from "@common/pagination/pagination-response";
-import { ResponseDetail } from "@common/response/response-detail-create-update";
-import { ResponseList } from "@common/response/response-list";
-import { ResponseMsg } from "@common/response/response-message";
-import { IMovie } from "@common/utils/type";
-import { Actor } from "@database/entities/cinema/actor";
-import { Gerne } from "@database/entities/cinema/gerne";
-import { Movie } from "@database/entities/cinema/movie";
-import { Version } from "@database/entities/cinema/version";
-import { Injectable,  NotFoundException, BadRequestException } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, In } from "typeorm";
-import { CreateMovieDto } from "./dtos/createMovie.dto";
-import { UpdateMovieDto } from "./dtos/updateMovie.dto";
+import { applySorting } from '@common/pagination/apply_sort';
+import { applyCommonFilters } from '@common/pagination/applyCommonFilters';
+import { applyPagination } from '@common/pagination/applyPagination';
+import { MoviePaginationDto } from '@common/pagination/dto/movie/moviePagination.dto';
+import { movieFieldMapping } from '@common/pagination/fillters/movieFieldMapping';
+import { buildPaginationResponse } from '@common/pagination/pagination-response';
+import { Actor } from '@database/entities/cinema/actor';
+
+import { Movie } from '@database/entities/cinema/movie';
+import { Version } from '@database/entities/cinema/version';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, In } from 'typeorm';
+import { CreateMovieDto } from './dtos/createMovie.dto';
+import { UpdateMovieDto } from './dtos/updateMovie.dto';
+import { Genre } from '@database/entities/cinema/genre';
 
 
 @ApiTags('Movies')
@@ -28,12 +29,12 @@ export class MovieService {
     private readonly movieRepository: Repository<Movie>,
     @InjectRepository(Actor)
     private readonly actorRepository: Repository<Actor>,
-    @InjectRepository(Gerne)
-    private readonly gerneRepository: Repository<Gerne>,
+    @InjectRepository(Genre)
+    private readonly genreRepository: Repository<Genre>,
     @InjectRepository(Version)
     private readonly versionRepository: Repository<Version>,
   ) {}
-  private getMovieSummary(movie: IMovie) {
+  private getMovieSummary(movie: Movie) {
     return {
       id: movie.id,
       name: movie.name,
@@ -49,29 +50,25 @@ export class MovieService {
       thumbnail: movie.thumbnail,
       banner: movie.banner,
       is_deleted: movie.is_deleted,
+      created_at: movie.created_at,
       actors: movie.actors.map((actor) => ({
         id: actor.id,
-        name: actor.name,
+        actor_name: actor.actor_name,
       })),
-      gernes: movie.gernes.map((gerne) => ({
-        id: gerne.id,
-        genre_name: gerne.genre_name,
+      genres: movie.genres.map((genre) => ({
+        id: genre.id,
+        genre_name: genre.genre_name,
       })),
       versions: movie.versions.map((version) => ({
         id: version.id,
-        name: version.name,
+        version_name: version.version_name,
       })),
     };
   }
-  async getAllMoviesUser(): Promise<IMovie[]> {
-    const movies = await this.movieRepository.find({
-      where: { is_deleted: false },
-      relations: ['gernes', 'actors', 'versions'],
-    });
-    return movies.map((movie) => this.getMovieSummary(movie));
-  }
-  
-  async getAllMovies(fillters: MoviePaginationDto) : Promise<ResponseList<IMovie>> {
+
+  async getAllMovies(
+    fillters: MoviePaginationDto,
+  ): Promise<ReturnType<typeof buildPaginationResponse>> {
     const qb = this.movieRepository
       .createQueryBuilder('movie')
       .leftJoinAndSelect('movie.actors', 'actor')
@@ -88,316 +85,134 @@ export class MovieService {
       'gerne.genre_name',
       'actor.name',
       'version.name',
+      'movie.created_at',
     ];
     applySorting(
       qb,
       fillters.sortBy,
       fillters.sortOrder,
       allowedFields,
-      'movie.name',
+      'movie.created_at',
     );
     applyPagination(qb, {
       page: fillters.page,
       take: fillters.take,
     });
     const [movies, total] = await qb.getManyAndCount();
-    const summaries = movies.map((movie) => this.getMovieSummary(movie));
-    const counts: { activeCount: number; deletedCount: number } = await this.movieRepository
-      .createQueryBuilder('movie')
-      .select([
-        `SUM(CASE WHEN movie.is_deleted = false THEN 1 ELSE 0 END) AS activeCount`,
-        `SUM(CASE WHEN movie.is_deleted = true THEN 1 ELSE 0 END) AS deletedCount`,
-      ])
-      .getRawOne() || { activeCount: 0, deletedCount: 0 };
-      
+    const counts: { activeCount: number; deletedCount: number } =
+      (await this.movieRepository
+        .createQueryBuilder('movie')
+        .select([
+          `SUM(CASE WHEN movie.is_deleted = false THEN 1 ELSE 0 END) AS activeCount`,
+          `SUM(CASE WHEN movie.is_deleted = true THEN 1 ELSE 0 END) AS deletedCount`,
+        ])
+        .getRawOne()) || { activeCount: 0, deletedCount: 0 };
+
     const activeCount = Number(counts.activeCount) || 0;
     const deletedCount = Number(counts.deletedCount) || 0;
-    return ResponseList.ok(buildPaginationResponse(summaries,{ total, page: fillters.page, take: fillters.take,activeCount, deletedCount }))
+    return buildPaginationResponse(
+      movies.map((movie) => this.getMovieSummary(movie)),
+      {
+        total,
+        page: fillters.page,
+        take: fillters.take,
+        activeCount,
+        deletedCount,
+      },
+    );
   }
 
-  async getMovieById(id: number): Promise<IMovie> {
-    const movie = await this.movieRepository.findOne({
-      where: { id },
-      relations: ['gernes', 'actors', 'versions'], 
-    });
-    if (!movie) {
-      throw new NotFoundException(`Movie with ID ${id} not found`);
-    }
+  private async findActorbyIds(ids: number[]): Promise<void> {
+    if (!ids.length) return;
 
+    const count = await this.actorRepository.count({
+      where: { id: In(ids) },
+    });
+
+    if (count !== ids.length) {
+      throw new NotFoundException('Some actors not found');
+    }
+  }
+
+  private async findGenreByIds(ids: number[]): Promise<void> {
+    if (!ids.length) return;
+
+    const count = await this.genreRepository.count({
+      where: { id: In(ids) },
+    });
+
+    if (count !== ids.length) {
+      throw new NotFoundException('Some genres not found');
+    }
+  }
+
+  private async findVersionbyIds(ids: number[]): Promise<void> {
+    if (!ids.length) return;
+
+    const count = await this.versionRepository.count({
+      where: { id: In(ids) },
+    });
+
+    if (count !== ids.length) {
+      throw new NotFoundException('Some versions not found');
+    }
+  }
+
+  async createMovie(movieDto: CreateMovieDto) : Promise<Movie> {
+    // check actors, gernes, versions existence
+    await Promise.all([
+      this.findActorbyIds(movieDto.id_Actor || []),
+      this.findGenreByIds(movieDto.id_Gerne || []),
+      this.findVersionbyIds(movieDto.id_Version || []),
+    ]);
+    const newMovie = this.movieRepository.create(movieDto);
+    return this.movieRepository.save(newMovie);
+  }
+
+  async updateMovie(id: number, movieDto: UpdateMovieDto) : Promise<ReturnType<typeof this.getMovieSummary>> {
+       await this.movieRepository.update(id, movieDto);
+       return await this.findMovieById(id);
+  }
+
+
+  async findMovieById(id: number): Promise<ReturnType<typeof this.getMovieSummary>> {
+       const movie = await this.movieRepository.findOne({
+         where: { id },
+         relations: ['actors', 'gernes', 'versions'],
+       });
+        if (!movie) {
+      throw new NotFoundException(`Movie with ID ${id} not found`, 'MOVIE_NOT_FOUND');
+    }
     return this.getMovieSummary(movie);
   }
+   
 
-  async createMovie(movieDto: CreateMovieDto): Promise<ResponseDetail<Movie>> {
-    try {
-      const existingMovie = await this.movieRepository.findOne({
-        where: { name: movieDto.name },
-      });
-
-      if (existingMovie) {
-        throw new BadRequestException(
-          `Movie with name "${movieDto.name}" already exists.`,
-        );
-      }
-      const movie = this.movieRepository.create(movieDto);
-
-      if (movieDto.id_Actor) {
-        const actors = await this.actorRepository.find({
-          where: { id: In(movieDto.id_Actor) },
-          select: ['id', 'name'],
-        });
-        if (actors.length === 0) {
-          throw new NotFoundException(
-            `No actors found with the provided IDs: [${movieDto.id_Actor.join(', ')}]`,
-          );
-        }
-        movie.actors = actors;
-      }
-
-
-      if (movieDto.id_Gerne) {
-        const gernes = await this.gerneRepository.find({
-          where: { id: In(movieDto.id_Gerne) },
-          select: ['id', 'genre_name'],
-        });
-        if (gernes.length === 0) {
-          throw new NotFoundException(
-            `No genres found with the provided IDs: [${movieDto.id_Gerne.join(', ')}]`,
-          );
-        }
-        movie.gernes = gernes;
-      }
-
-
-      if (movieDto.id_Version) {
-        const versions = await this.versionRepository.find({
-          where: { id: In(movieDto.id_Version) },
-          select: ['id', 'name'],
-        });
-        if (versions.length === 0) {
-          throw new NotFoundException(
-            `No versions found with the provided IDs: [${movieDto.id_Version.join(', ')}]`,
-          );
-        }
-        movie.versions = versions;
-      }
-
-      await this.movieRepository.save(movie);
-      return ResponseDetail.ok(movie);
-    } catch (error) {
-
-      if (
-        error instanceof BadRequestException ||
-        error instanceof NotFoundException
-      ) {
-        throw error;
-      }
-
+  async restoreMovie(id: number): Promise<void> {
+    const movie = await this.findMovieById(id);
+    if(!movie.is_deleted){
       throw new BadRequestException(
-        error.message || 'Unknown error when creating movie',
+        `Movie with ID ${id} is not soft-deleted`,
+        'MOVIE_NOT_DELETED',
       );
     }
+    await this.movieRepository.update(id, { is_deleted: false });
+    
   }
-
-  async updateMovie(
-    id: number,
-    movieDto: UpdateMovieDto,
-  ): Promise<ResponseDetail<Movie | null>> {
-    const existingMovie = await this.movieRepository.findOne({
-      where: { id },
-      relations: ['gernes', 'actors', 'versions'],
-    });
-
-    if (!existingMovie) {
-      throw new NotFoundException(`Movie with ID ${id} not found`);
+    async softDeleteMovie(id: number): Promise<void> {
+          const movie = await this.findMovieById(id);
+    if(movie.is_deleted){
+      throw new BadRequestException(
+        `Movie with ID ${id} is already soft-deleted`,
+        'MOVIE_ALREADY_DELETED',
+      );
     }
-
-    Object.assign(existingMovie, movieDto);
-
+    await this.movieRepository.update(id, { is_deleted: true });
+  }
   
-    if (movieDto.id_Actor) {
-      const actors = await this.actorRepository.find({
-        where: { id: In(movieDto.id_Actor) },
-        select: ['id', 'name'],
-      });
-      if (actors.length === 0) {
-        throw new NotFoundException(`No actors found with the provided IDs`);
-      }
-      existingMovie.actors = actors;
-    }
 
-
-    if (movieDto.id_Gerne) {
-      const gernes = await this.gerneRepository.find({
-        where: { id: In(movieDto.id_Gerne) },
-        select: ['id', 'genre_name'],
-      });
-      if (gernes.length === 0) {
-        throw new NotFoundException(`No genres found with the provided IDs`);
-      }
-      existingMovie.gernes = gernes;
-    }
-
-
-    if (movieDto.id_Version) {
-      const versions = await this.versionRepository.find({
-        where: { id: In(movieDto.id_Version) },
-        select: ['id', 'name'],
-      });
-      if (versions.length === 0) {
-        throw new NotFoundException(`No versions found with the provided IDs`);
-      }
-      existingMovie.versions = versions;
-    }
-
-    await this.movieRepository.save(existingMovie);
-    return ResponseDetail.ok(existingMovie);
-  }
-
-  async deleteMovie(id: number) : Promise<ResponseMsg> {
-    const result = await this.movieRepository.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException(`Movie with ID ${id} not found`);
-    }
-    return ResponseMsg.ok('Movie deleted successfully');
-  }
-
-  async softDeleteMovie(id: number) {
-    const movie = await this.getMovieById(id);
-    movie.is_deleted = true;
-    await this.movieRepository.save(movie);
-    return { msg: 'Movie soft-deleted successfully', movie };
-  }
-
-  async restoreMovie(id: number)  : Promise<ResponseMsg> {
-    const movie = await this.movieRepository.findOne({ where: { id } });
-    if (!movie) {
-      throw new NotFoundException(`Movie with ID ${id} not found`);
-    }
-    if (!movie.is_deleted) {
-      throw new BadRequestException(`Movie with ID ${id} is not soft-deleted`);
-    }
-    movie.is_deleted = false;
-    await this.movieRepository.save(movie);
-    return ResponseMsg.ok('Movie restored successfully');
-  }
-
-  async getActorsOfMovie(
-    movieId: number,
-  ): Promise<{ id: number; name: string }[]> {
-    const movie = await this.movieRepository.findOne({
-      where: { id: movieId },
-      relations: ['actors'],
-    });
-
-    if (!movie) {
-      throw new NotFoundException(`Movie with ID ${movieId} not found`);
-    }
-
-
-    return movie.actors.map((actor) => ({ id: actor.id, name: actor.name }));
-  }
-
-  async removeActorFromMovie(movieId: number, actorId: number): Promise<Movie> {
-    const movie = await this.movieRepository.findOne({
-      where: { id: movieId },
-      relations: ['actors'],
-    });
-
-    if (!movie) {
-      throw new NotFoundException(`Movie with ID ${movieId} not found`);
-    }
-
-    const actor = await this.actorRepository.findOne({
-      where: { id: actorId },
-    });
-
-    if (!actor) {
-      throw new NotFoundException(`Actor with ID ${actorId} not found`);
-    }
-
-    movie.actors = movie.actors.filter(
-      (existingActor) => existingActor.id !== actorId,
-    );
-
-    return await this.movieRepository.save(movie);
-  }
-
-  async getGernesOfMovie(movieId: number): Promise<Gerne[]> {
-    const movie = await this.movieRepository.findOne({
-      where: { id: movieId },
-      relations: ['gernes'],
-    });
-
-    if (!movie) {
-      throw new NotFoundException(`Movie with ID ${movieId} not found`);
-    }
-
-    return movie.gernes;
-  }
-  async removeGerneFromMovie(movieId: number, gerneId: number): Promise<Movie> {
-    const movie = await this.movieRepository.findOne({
-      where: { id: movieId },
-      relations: ['gernes'], 
-    });
-
-    const gerne = await this.gerneRepository.findOne({
-      where: { id: gerneId },
-    });
-
-    if (!movie) {
-      throw new NotFoundException(`Movie with ID ${movieId} not found`);
-    }
-
-    if (!gerne) {
-      throw new NotFoundException(`Gerne with ID ${gerneId} not found`);
-    }
-
-
-    const isGerneInMovie = movie.gernes.some(
-      (existingGerne) => existingGerne.id === gerneId,
-    );
-    if (!isGerneInMovie) {
-      throw new BadRequestException(
-        `Gerne with ID ${gerneId} is not associated with the movie.`,
-      );
-    }
-
-    movie.gernes = movie.gernes.filter(
-      (existingGerne) => existingGerne.id !== gerneId,
-    );
-    return await this.movieRepository.save(movie);
-  }
-
-  async getVersionsOfMovie(movieId: number): Promise<Version[]> {
-    const movie = await this.movieRepository.findOne({
-      where: { id: movieId },
-      relations: ['versions'],
-    });
-
-    if (!movie) {
-      throw new NotFoundException(`Movie with ID ${movieId} not found`);
-    }
-
-    return movie.versions;
-  }
-
-  async getMoviesPaginated(
-    page = 1,
-    limit = 10,
-  ): Promise<{ data: IMovie[]; total: number; page: number; limit: number }> {
-    const [movies, total] = await this.movieRepository.findAndCount({
-      relations: ['gernes', 'actors', 'versions'],
-      skip: (page - 1) * limit,
-      take: limit,
-      order: {
-        id: 'DESC',
-      },
-    });
-    return {
-      data: movies.map((movie) => this.getMovieSummary(movie)),
-      total,
-      page,
-      limit,
-    };
+  async removeMovie(id: number): Promise<void> {
+    await this.movieRepository.delete(id);
   }
 }
+
+

@@ -6,27 +6,34 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 export class MoviePaginationDto extends BasePaginationDto {
   @ApiPropertyOptional({
     description: 'Search term to filter results',
-    example: 'movie.name',
+    example: 'name',
   })
   @IsOptional()
   @IsString()
   search?: string;
-
+  //
   @ApiPropertyOptional({
-    description: 'Field to sort by',
-    example: 'movie.id | movie.name |movie.nation | movie.director | genre.genre_name | version.name |actor.name',
+    enum: [
+      'movie.id',
+      'movie.name',
+      'movie.nation',
+      'genre.genre_name',
+      'version.name',
+      'movie.created_at',
+    ],
   })
   @IsOptional()
-  @IsString()
-  sortBy?: string;
+  @IsIn([
+    'movie.id',
+    'movie.name',
+    'movie.nation',
+    'genre.genre_name',
+    'version.name',
+    'movie.created_at',
+  ])
+  sortBy = 'movie.created_at';
 
-  @IsOptional()
-  @IsString()
-  name?: string;
-
-  @IsOptional()
-  @IsString()
-  director?: string;
+ 
 
   @IsOptional()
   @IsString()

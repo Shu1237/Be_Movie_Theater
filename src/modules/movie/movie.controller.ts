@@ -28,11 +28,11 @@ export class MovieController {
 
 
   // GET - get all movies for admin (with pagination)
-  @Get('admin')
-  @ApiOperation({ summary: 'Get all movies for admin' })
+  @Get()
+  @ApiOperation({ summary: 'Get all movies ' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
-  getAllMovies(@Query() query: MoviePaginationDto) {
+  getAll(@Query() query: MoviePaginationDto) {
     const { page = 1, take = 10, ...restFilters } = query;
     return this.movieService.getAllMovies({
       page,
@@ -44,19 +44,12 @@ export class MovieController {
   // GET - get movie by ID
   @Get(':id')
   @ApiOperation({ summary: 'Get movie by ID' })
-  getMovieById(@Param('id', ParseIntPipe) id: number) {
-    return this.movieService.getMovieById(id);
+  getById(@Param('id', ParseIntPipe) id: number) {
+    return this.movieService.findMovieById(id);
   }
 
-  // GET - get all genres of a movie
 
-  @Get(':movieId/gernes')
-  @ApiOperation({ summary: 'Get all genres of a movie' })
-  getGernesOfMovie(
-    @Param('movieId', ParseIntPipe) movieId: number,
-  ) {
-    return this.movieService.getGernesOfMovie(movieId);
-  }
+
 
   // POST - Create new movie
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -100,12 +93,12 @@ export class MovieController {
     return await this.movieService.restoreMovie(id);
   }
 
-  // DELETE - Hard delete movie by ID
+  // // DELETE - Hard delete movie by ID
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.EMPLOYEE)
   @Delete(':id')
   @ApiOperation({ summary: 'Hard delete a movie by ID (admin, employee only)' })
-  async deleteMovie(@Param('id', ParseIntPipe) id: number) {
-    return this.movieService.deleteMovie(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return this.movieService.removeMovie(id);
   }
 }

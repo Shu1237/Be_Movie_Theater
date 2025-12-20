@@ -1,6 +1,6 @@
 import { Actor } from './entities/cinema/actor';
 import { CinemaRoom } from './entities/cinema/cinema-room';
-import { Gerne } from './entities/cinema/gerne';
+
 import { Movie } from './entities/cinema/movie';
 import { Schedule } from './entities/cinema/schedule';
 import { ScheduleSeat } from './entities/cinema/schedule_seat';
@@ -23,6 +23,7 @@ import { User } from './entities/user/user';
 import { Product } from './entities/item/product';
 import { OrderExtra } from './entities/order/order-extra';
 import { DailyTransactionSummary } from './entities/order/daily_transaction_summary';
+import { Genre } from './entities/cinema/genre';
 
 export const allEntities = [
   User,
@@ -41,7 +42,7 @@ export const allEntities = [
   Movie,
   Actor,
   CinemaRoom,
-  Gerne,
+  Genre,
   Schedule,
   Seat,
   SeatType,

@@ -3,18 +3,7 @@ import { FilterField } from '@common/utils/type';
 import { SelectQueryBuilder } from 'typeorm';
 
 export const movieFieldMapping: Record<string, FilterField> = {
-  name: {
-    field: 'movie.name',
-    operator: 'LIKE',
-  },
-  director: {
-    field: 'movie.director',
-    operator: 'LIKE',
-  },
-  nation: {
-    field: 'movie.nation',
-    operator: 'LIKE',
-  },
+ 
   fromDate: {
     customWhere: (qb: SelectQueryBuilder<any>, value: string) => {
       qb.andWhere('movie.from_date >= :start', {
@@ -48,7 +37,7 @@ export const movieFieldMapping: Record<string, FilterField> = {
   search: {
     customWhere: (qb: SelectQueryBuilder<any>, value: string) => {
       qb.andWhere(
-        `(movie.name LIKE :search OR movie.director LIKE :search OR movie.nation LIKE :search)`,
+        `(movie.name LIKE :search)`,
         { search: `%${value}%` },
       );
     },

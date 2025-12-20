@@ -96,7 +96,7 @@ export class CreateMovieDto {
   })
   to_date: Date;
 
-  @IsOptional()
+
   @IsString()
   @ApiProperty({
     description: 'Tên công ty sản xuất bộ phim',
@@ -119,12 +119,4 @@ export class CreateMovieDto {
     example: 'https://example.com/banner.jpg',
   })
   banner?: string;
-
-  @IsOptional()
-  @IsBoolean()
-  @ApiProperty({
-    description: 'Trạng thái xóa của bộ phim (true nếu đã bị xóa)',
-    example: false,
-  })
-  is_deleted?: boolean;
 }

@@ -1,12 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger/dist/decorators/api-property.decorator';
-import { IsOptional, IsString } from 'class-validator';
+import { PartialType } from '@nestjs/swagger';
 
-export class UpdateVersionDto {
-  @IsOptional()
-  @IsString()
-  @ApiProperty({
-    description: 'Version name',
-    example: 'Updated Version 1',
-  })
-  name?: string;
-}
+
+import { CreateVersionDto } from './create-version.dto';
+
+export class UpdateVersionDto extends PartialType(CreateVersionDto) {}

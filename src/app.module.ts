@@ -12,7 +12,7 @@ import { MovieModule } from './modules/movie/movie.module';
 import { OrderModule } from './modules/order/order.module';
 import { PromotionModule } from './modules/promotion/promotion.module';
 import { ActorModule } from './modules/actor/actor.module';
-import { GerneModule } from './modules/gerne/gerne.module';
+
 import { VersionModule } from './modules/version/version.module';
 import { CinemaRoomModule } from './modules/cinema-room/cinema-room.module';
 import { ScheduleModule as ScheduleByDb } from './modules/schedule/schedule.module';
@@ -27,6 +27,7 @@ import { PaymentMethodModule } from './modules/payment-method/payment-method.mod
 import { OverviewModule } from './modules/overview/overview.module';
 import { RedisModule } from './common/redis/redis.module';
 import { UserModule } from '@modules/user/user.module';
+import { GenreModule } from '@modules/gerne/gerne.module';
 
 @Module({
   imports: [
@@ -52,7 +53,7 @@ import { UserModule } from '@modules/user/user.module';
         password: configService.get<string>('database.password'),
         database: configService.get<string>('database.name'),
         entities: allEntities,
-        synchronize: true,
+        synchronize: false,
         autoLoadEntities: true,
       }),
       inject: [ConfigService],
@@ -64,7 +65,7 @@ import { UserModule } from '@modules/user/user.module';
     ActorModule,
     AuthModule,
     CinemaRoomModule,
-    GerneModule,
+    GenreModule,
     HistoryScoreModule,
     MovieModule,
     OrderModule,
@@ -83,7 +84,6 @@ import { UserModule } from '@modules/user/user.module';
     // Shared Modules
     // CronModule,
     // MyGateWayModule,
-    // S3Module,
   ],
 })
 export class AppModule {}

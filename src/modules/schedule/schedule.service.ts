@@ -46,7 +46,7 @@ export class ScheduleService {
       version: schedule.version
         ? {
             id: schedule.version.id,
-            name: schedule.version.name,
+            name: schedule.version.version_name,
           }
         : null, 
     };

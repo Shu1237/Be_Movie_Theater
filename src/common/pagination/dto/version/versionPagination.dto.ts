@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsBoolean } from 'class-validator';
+import { IsOptional, IsString, IsBoolean, IsIn } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { BasePaginationDto } from '../basePagination.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
@@ -6,7 +6,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 export class VersionPaginationDto extends BasePaginationDto {
   @ApiPropertyOptional({
     description: 'Search term to filter results',
-    example: 'version.name',
+    example: 'version.version_name',
   })
   @IsOptional()
   @IsString()
@@ -14,12 +14,12 @@ export class VersionPaginationDto extends BasePaginationDto {
 
   @ApiPropertyOptional({
     description: 'Field to sort by',
-    example: 'version.name | version.id',
+    enum: ['version.id', 'version.version_name', 'version.created_at'],
+    example: 'version.created_at',
   })
   @IsOptional()
-  @IsString()
-  sortBy?: string;
-
+  @IsIn(['version.id', 'version.version_name', 'version.created_at'])
+  sortBy? = 'version.created_at';
   @Transform(({ value }) => value === 'true' || value === true)
   @IsOptional()
   @IsBoolean()

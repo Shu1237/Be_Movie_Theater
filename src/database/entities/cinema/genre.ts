@@ -2,25 +2,31 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  OneToMany,
   ManyToMany,
   JoinTable,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-// import { MovieGenre } from './gerne-movie';
 import { Movie } from './movie';
 
 @Entity('genre')
-export class Gerne {
+export class Genre {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @Column({ type: 'varchar', length: 255, nullable: true, unique: true })
+  @Column({ type: 'varchar', length: 100, unique: true })
   genre_name: string;
-  
-  @Column({ type: 'boolean', default: false })
-  is_deleted: boolean; //
 
-  @ManyToMany(() => Movie, (movie) => movie.gernes)
+  @Column({ type: 'boolean', default: false })
+  is_deleted: boolean;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
+
+  @ManyToMany(() => Movie, (movie) => movie.genres)
   @JoinTable()
   movies: Movie[];
 }

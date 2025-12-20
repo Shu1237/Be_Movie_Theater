@@ -32,12 +32,12 @@ export class VersionController {
 
 
  
-  @Get('admin')
+  @Get()
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
   @ApiQuery({ name: 'search', required: false, type: String, example: '2D' })
   @ApiOperation({ summary: 'Get all versions for admin' })
-  async findAll(@Query() query: VersionPaginationDto) {
+  async getAll(@Query() query: VersionPaginationDto) {
     const { page = 1, take = 10, ...filters } = query;
 
     return this.versionService.findAllVersions({
@@ -50,15 +50,15 @@ export class VersionController {
   // GET - Get version by ID
   @Get(':id')
   @ApiOperation({ summary: 'Get version by ID' })
-  async findOne(@Param('id') id: number) {
-    return await this.versionService.findOne(id);
+  async getById(@Param('id', ParseIntPipe) id: number) {
+    return await this.versionService.findVersionById(id);
   }
 
   // POST - Create new version
   @UseGuards(JwtAuthGuard,RolesGuard)
   @Roles(Role.ADMIN, Role.EMPLOYEE)
   @Post()
-  @ApiOperation({ summary: 'Create a new version (admin only)' })
+  @ApiOperation({ summary: 'Create a new version (admin, employee only)' })
   async create(@Body() createVersionDto: CreateVersionDto) {
     return await this.versionService.createVersion(createVersionDto);
   }
@@ -68,7 +68,7 @@ export class VersionController {
   @Roles(Role.ADMIN, Role.EMPLOYEE)
 
   @Put(':id')
-  @ApiOperation({ summary: 'Update a version by ID (admin only)' })
+  @ApiOperation({ summary: 'Update a version by ID (admin, employee only)' })
   async update(
     @Param('id') id: number,
     @Body() updateVersionDto: UpdateVersionDto) {
@@ -80,7 +80,7 @@ export class VersionController {
   @Roles(Role.ADMIN, Role.EMPLOYEE)
   @Patch(':id/soft-delete')
   @ApiOperation({ summary: 'Soft delete a version (admin, employee only)' })
-  async softDeleteVersion(@Param('id', ParseIntPipe) id: number) {
+  async softDelete(@Param('id', ParseIntPipe) id: number) {
     return await this.versionService.softDeleteVersion(id);
   }
 
@@ -91,16 +91,16 @@ export class VersionController {
   @ApiOperation({
     summary: 'Restore a soft-deleted version (admin, employee only)',
   })
-  async restoreVersion(@Param('id', ParseIntPipe) id: number) {
+  async restore(@Param('id', ParseIntPipe) id: number) {
     return await this.versionService.restoreVersion(id);
   }
 
   // DELETE - Delete version permanently
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN, Role.EMPLOYEE)
+  @Roles(Role.ADMIN)
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a version by ID (admin only)' })
-  async remove(@Param('id') id: number) {
+  @ApiOperation({ summary: 'Delete a version by ID (admin)' })
+  async remove(@Param('id', ParseIntPipe) id: number) {
     return await this.versionService.removeVersion(id);
   }
 }

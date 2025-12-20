@@ -47,13 +47,13 @@ export class CinemaRoomService {
 
     const qb = this.cinemaRoomRepository.createQueryBuilder('cinemaRoom');
     applyCommonFilters(qb, filters, cinemaRoomFieldMapping);
-    const allowedSortFields = ['cinemaRoom.id', 'cinemaRoom.cinema_room_name'];
+    const allowedSortFields = ['cinemaRoom.id', 'cinemaRoom.cinema_room_name', 'cinemaRoom.created_at'];
     applySorting(
       qb,
       filters.sortBy,
       filters.sortOrder,
       allowedSortFields,
-      'cinemaRoom.id',
+      'cinemaRoom.created_at',
     );
 
     applyPagination(qb, {

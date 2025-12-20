@@ -4,12 +4,15 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   ManyToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 import { Schedule } from './schedule';
 import { Actor } from './actor';
-import { Gerne } from './gerne';
+
 import { Version } from './version';
+import { Genre } from './genre';
 
 @Entity('movie')
 export class Movie {
@@ -55,6 +58,11 @@ export class Movie {
   @Column({ type: 'boolean', default: false })
   is_deleted: boolean;
 
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 
   @OneToMany(() => Schedule, (schedule) => schedule.movie)
   schedules: Schedule[];
@@ -62,11 +70,9 @@ export class Movie {
   @ManyToMany(() => Actor, (actor) => actor.movies)
   actors: Actor[];
 
-  @ManyToMany(() => Gerne, (gerne) => gerne.movies)
-  gernes: Gerne[];
+  @ManyToMany(() => Genre, (genre) => genre.movies)
+  genres: Genre[];
 
   @ManyToMany(() => Version, (version) => version.movies)
   versions: Version[];
 }
-
-

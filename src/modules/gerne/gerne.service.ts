@@ -1,39 +1,42 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateGerneDto } from './dtos/createGerne';
-import { UpdateGerneDto } from './dtos/updateGerne';
+
 import { applySorting } from '@common/pagination/apply_sort';
 import { applyCommonFilters } from '@common/pagination/applyCommonFilters';
 import { applyPagination } from '@common/pagination/applyPagination';
-import { GernePaginationDto } from '@common/pagination/dto/gerne/gerne.dto';
-import { gerneFieldMapping } from '@common/pagination/fillters/gerne-field-mapping';
+
 import { buildPaginationResponse } from '@common/pagination/pagination-response';
-import { Gerne } from '@database/entities/cinema/gerne';
+import { Genre } from '@database/entities/cinema/genre';
+import { CreateGenreDto } from './dtos/createGerne';
+import { GenrePaginationDto } from '@common/pagination/dto/gerne/gerne.dto';
+import { genreFieldMapping } from '@common/pagination/fillters/genre-field-mapping';
+import { UpdateGenreDto } from './dtos/updateGerne';
+
 
 
 @Injectable()
-export class GerneService {
+export class GenreService {
   constructor(
-    @InjectRepository(Gerne)
-    private readonly gerneRepository: Repository<Gerne>,
+    @InjectRepository(Genre)
+    private readonly genreRepository: Repository<Genre>,
   ) {}
 
-  async createGerne(
-    createGerneDto: CreateGerneDto,
-  ): Promise<Gerne> {
-   const newGerne = this.gerneRepository.create(createGerneDto);
-   return this.gerneRepository.save(newGerne);
+  async createGenre(
+    createGenreDto: CreateGenreDto,
+  ): Promise<Genre> {
+   const newGenre = this.genreRepository.create(createGenreDto);
+   return this.genreRepository.save(newGenre  );
   }
 
-  async findAllGernes(
-    filters: GernePaginationDto,
+  async findAllGenres(
+    filters: GenrePaginationDto,
   ) {
-    const qb = this.gerneRepository.createQueryBuilder('gerne');
+    const qb = this.genreRepository.createQueryBuilder('genre');
 
-    applyCommonFilters(qb, filters, gerneFieldMapping);
+    applyCommonFilters(qb, filters, genreFieldMapping);
 
-    const allowedSortFields = ['gerne.genre_name', 'gerne.id'];
+    const allowedSortFields = ['genre.genre_name', 'genre.id'];
     applySorting(
       qb,
       filters.sortBy,
@@ -47,21 +50,20 @@ export class GerneService {
       take: filters.take,
     });
 
-    const [gernes, total] = await qb.getManyAndCount();
+    const [genres, total] = await qb.getManyAndCount();
 
-    // Get counts for active and deleted genres
-    const counts = (await this.gerneRepository
-      .createQueryBuilder('gerne')
+    const counts = (await this.genreRepository
+      .createQueryBuilder('genre')
       .select([
-        `SUM(CASE WHEN gerne.is_deleted = false THEN 1 ELSE 0 END) AS activeCount`,
-        `SUM(CASE WHEN gerne.is_deleted = true THEN 1 ELSE 0 END) AS deletedCount`,
+        `SUM(CASE WHEN genre.is_deleted = false THEN 1 ELSE 0 END) AS activeCount`,
+        `SUM(CASE WHEN genre.is_deleted = true THEN 1 ELSE 0 END) AS deletedCount`,
       ])
       .getRawOne()) || { activeCount: 0, deletedCount: 0 };
 
     const activeCount = Number(counts?.activeCount) || 0;
     const deletedCount = Number(counts?.deletedCount) || 0;
 
-    return buildPaginationResponse<Gerne>(gernes, {
+    return buildPaginationResponse<Genre>(genres, {
         total,
         page: filters.page,
         take: filters.take,
@@ -70,43 +72,43 @@ export class GerneService {
     })
   }
 
-  async findGerneById(id: number): Promise<Gerne> {
-    const gerne = await this.gerneRepository.findOne({ where: { id } });
-    if (!gerne) {
-      throw new NotFoundException(`Gerne with ID ${id} not found`);
+  async findGenreById(id: number): Promise<Genre> {
+    const genre = await this.genreRepository.findOne({ where: { id } });
+    if (!genre) {
+      throw new NotFoundException(`Genre with ID ${id} not found`);
     }
-    return gerne;
+    return genre;
   }
 
-  async updateGerne(
+  async updateGenre(
   id: number,
-  dto: UpdateGerneDto,
-): Promise<Gerne> {
-   await this.gerneRepository.update(id, dto);
-   return this.findGerneById(id);
+  dto: UpdateGenreDto,
+): Promise<Genre> {
+   await this.genreRepository.update(id, dto);
+   return this.findGenreById(id);
 }
 
-  async deleteGerne(id: number): Promise<void> {
-    await this.gerneRepository.delete(id);
+  async deleteGenre(id: number): Promise<void> {
+    await this.genreRepository.delete(id);
    
   }
-  async softDeleteGerne(id: number): Promise<void> {
-    const gerne = await this.gerneRepository.findOne({ where: { id } });
-    if (!gerne) {
-      throw new NotFoundException(`Gerne with ID ${id} not found`);
+  async softDeleteGenre(id: number): Promise<void> {
+    const genre = await this.genreRepository.findOne({ where: { id } });
+    if (!genre) {
+      throw new NotFoundException(`Genre with ID ${id} not found`);
     }
 
-    await this.gerneRepository.update(id, { is_deleted: true });
+    await this.genreRepository.update(id, { is_deleted: true });
   }
 
-  async restoreGerne(id: number): Promise<void> {
-    const gerne = await this.gerneRepository.findOne({ where: { id } });
-    if (!gerne) {
-      throw new NotFoundException(`Gerne with ID ${id} not found`);
+  async restoreGenre(id: number): Promise<void> {
+    const genre = await this.genreRepository.findOne({ where: { id } });
+    if (!genre) {
+      throw new NotFoundException(`Genre with ID ${id} not found`);
     }
-    if (!gerne.is_deleted) {
-      throw new BadRequestException(`Gerne with ID ${id} is not soft-deleted`);
+    if (!genre.is_deleted) {
+      throw new BadRequestException(`Genre with ID ${id} is not soft-deleted`);
     }
-    await this.gerneRepository.update(id, { is_deleted: false });
+    await this.genreRepository.update(id, { is_deleted: false });
   }
 }

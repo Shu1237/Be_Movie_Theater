@@ -4,6 +4,8 @@ import {
   Column,
   ManyToMany,
   JoinTable,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Movie } from './movie';
 
@@ -13,10 +15,17 @@ export class Version {
   id: number;
 
   @Column({ type: 'varchar', length: 255, unique: true })
-  name: string;
+  version_name: string;
 
   @Column({ type: 'boolean', default: false })
-  is_deleted: boolean; //
+  is_deleted: boolean; 
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
+
   @ManyToMany(() => Movie, (movie) => movie.versions)
   @JoinTable()
   movies: Movie[];
