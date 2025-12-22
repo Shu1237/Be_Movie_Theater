@@ -7,11 +7,8 @@ export const ticketFieldMapping: Record<string, FilterField> = {
     customWhere: (qb: SelectQueryBuilder<any>, value: string) => {
       qb.andWhere(
         `(
-         movie.name LIKE :search OR
-        seatType.seat_type_name LIKE :search OR
-        cinemaRoom.cinema_room_name LIKE :search OR
-        ticketType.ticket_name LIKE :search OR
-        version.name LIKE :search
+        movie.name LIKE :search OR
+        version.version_name LIKE :search
         )`,
         { search: `%${value}%` },
       );

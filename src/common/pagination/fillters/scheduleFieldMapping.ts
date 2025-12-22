@@ -3,14 +3,14 @@ import { FilterField } from '@common/utils/type';
 import { SelectQueryBuilder } from 'typeorm';
 
 export const scheduleFieldMapping: Record<string, FilterField> = {
-  movieName: {
-    field: 'movie.name',
-    operator: 'LIKE',
-  },
-  cinemaRoomName: {
-    field: 'cinemaRoom.cinema_room_name',
-    operator: 'LIKE',
-  },
+ search:{
+    customWhere: (qb: SelectQueryBuilder<any>, value: string) => {
+      qb.andWhere(
+        '(movie.name LIKE :search)',
+        { search: `%${value}%` },
+      );
+    }
+ },
   version_id: {
     field: 'version.id',
     operator: '=',

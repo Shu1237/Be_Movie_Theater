@@ -2,12 +2,12 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  OneToOne,
-  JoinColumn,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Order } from './order';
 import { PaymentMethod } from './payment-method';
+import { StatusOrder } from '@common/enums/status-order.enum';
 
 @Entity('transactions')
 export class Transaction {
@@ -20,13 +20,19 @@ export class Transaction {
   @Column({ type: 'date', nullable: false })
   transaction_date: Date;
 
-  @Column({ type: 'decimal', nullable: false, precision: 10, scale: 2 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
   prices: string;
 
-  @Column({ type: 'varchar', nullable: false })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: StatusOrder,
+    default: StatusOrder.PENDING,
+  })
+  status: StatusOrder;
 
-  @OneToOne(() => Order, (order) => order.transaction)
+  @ManyToOne(() => Order, (order) => order.transactions, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'order_id' })
   order: Order;
 

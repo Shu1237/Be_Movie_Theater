@@ -5,6 +5,8 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { CinemaRoom } from './cinema-room';
 import { Movie } from './movie';
@@ -25,7 +27,13 @@ export class Schedule {
   end_movie_time: Date;
 
   @Column({ type: 'boolean', default: false })
-  is_deleted: boolean; //
+  is_deleted: boolean;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 
   @ManyToOne(() => CinemaRoom, (cinemaRoom) => cinemaRoom.schedules)
   @JoinColumn({ name: 'cinema_room_id' })
@@ -35,7 +43,7 @@ export class Schedule {
   @JoinColumn({ name: 'movie_id' })
   movie: Movie;
 
-  @ManyToOne(() => Version, { eager: true }) 
+  @ManyToOne(() => Version, { eager: true })
   @JoinColumn({ name: 'version_id' })
   version: Version;
 

@@ -5,6 +5,8 @@ import {
   JoinColumn,
   OneToMany,
   PrimaryColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Ticket } from '../order/ticket';
 import { CinemaRoom } from './cinema-room';
@@ -25,6 +27,11 @@ export class Seat {
   @Column({ type: 'boolean', default: false })
   is_deleted: boolean;
 
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
   @ManyToOne(() => SeatType, (seatType) => seatType.seats)
   @JoinColumn({ name: 'seat_type_id' })
   seatType: SeatType;

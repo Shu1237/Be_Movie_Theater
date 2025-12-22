@@ -1,16 +1,38 @@
 import { BasePaginationDto } from '../basePagination.dto';
-import { IsOptional, IsString, IsNumber, IsBoolean } from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsBoolean, IsIn } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class SchedulePaginationDto extends BasePaginationDto {
+  @ApiPropertyOptional({
+    description: 'Search term to filter results',
+    example: 'name | stage_name | nationality',
+  })
   @IsOptional()
   @IsString()
-  movieName?: string;
+  search?: string;
 
+  @ApiPropertyOptional({
+    description: 'Field to sort by',
+    enum: [
+      'schedule.id',
+      'movie.name',
+      'version.id',
+      'schedule.created_at',
+    ],
+    example: 'schedule.created_at',
+  })
   @IsOptional()
-  @IsString()
-  cinemaRoomName?: string;
+  @IsIn([
+    'schedule.id',
+    'movie.name',
+    'version.id',
+    'schedule.created_at',
 
+  ])
+  sortBy? = 'schedule.created_at';
+
+ 
   @IsOptional()
   @IsString()
   scheduleStartTime?: string;

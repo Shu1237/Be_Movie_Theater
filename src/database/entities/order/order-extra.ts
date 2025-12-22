@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { Product } from '../item/product';
 import { Order } from './order';
+import { StatusOrder } from '@common/enums/status-order.enum';
 
 @Entity('order_extra')
 export class OrderExtra {
@@ -19,8 +20,12 @@ export class OrderExtra {
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   unit_price: string;
 
-  @Column({ type: 'nvarchar', length: 255 })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: StatusOrder,
+    default: StatusOrder.PENDING,
+  })
+  status: StatusOrder;
 
   @ManyToOne(() => Order, (order) => order.orderExtras, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'order_id' })

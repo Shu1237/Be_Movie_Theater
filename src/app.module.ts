@@ -23,7 +23,7 @@ import { MyGateWayModule } from './common/gateways/seat.gateway.module';
 import { ScheduleSeatModule } from './modules/scheduleseat/scheduleseat.module';
 import { ProductModule } from './modules/product/product.module';
 import { HistoryScoreModule } from './modules/historyScore/historyScore.module';
-import { PaymentMethodModule } from './modules/payment-method/payment-method.module';
+
 import { OverviewModule } from './modules/overview/overview.module';
 import { RedisModule } from './common/redis/redis.module';
 import { UserModule } from '@modules/user/user.module';
@@ -53,7 +53,7 @@ import { GenreModule } from '@modules/gerne/gerne.module';
         password: configService.get<string>('database.password'),
         database: configService.get<string>('database.name'),
         entities: allEntities,
-        synchronize: false,
+        synchronize: true,
         autoLoadEntities: true,
       }),
       inject: [ConfigService],
@@ -72,7 +72,6 @@ import { GenreModule } from '@modules/gerne/gerne.module';
     OverviewModule,
     ProductModule,
     PromotionModule,
-    PaymentMethodModule,
     ScheduleByDb,
     ScheduleSeatModule,
     SeatModule,

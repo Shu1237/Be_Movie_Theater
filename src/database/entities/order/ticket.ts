@@ -1,11 +1,13 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Schedule } from '../cinema/schedule';
 import { Seat } from '../cinema/seat';
@@ -14,7 +16,7 @@ import { TicketType } from './ticket-type';
 
 @Entity('ticket')
 export class Ticket {
-   @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ default: false })
@@ -22,6 +24,11 @@ export class Ticket {
 
   @Column({ default: false })
   is_used: boolean;
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 
   @ManyToOne(() => Schedule, (schedule) => schedule.tickets)
   @JoinColumn({ name: 'schedule_id' })

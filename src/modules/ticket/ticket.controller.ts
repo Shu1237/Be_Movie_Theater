@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards, Req, Query } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards, Request, Query } from '@nestjs/common';
 import { TicketService } from './ticket.service';
 import { ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { Roles } from '@common/decorator/roles.decorator';
@@ -6,6 +6,7 @@ import { Role } from '@common/enums/roles.enum';
 import { JwtAuthGuard } from '@common/guards/jwt.guard';
 import { RolesGuard } from '@common/guards/roles.guard';
 import { TicketPaginationDto } from '@common/pagination/dto/ticket/ticket-pagination.dto';
+import { JWTUserType } from '@common/utils/type';
 
 
 
@@ -15,54 +16,16 @@ export class TicketController {
   constructor(private readonly ticketService: TicketService) { }
 
 
-  // GET - Get list of tickets for user
-  @Get('user')
-  @ApiOperation({ summary: 'Get all tickets for users' })
-  @ApiBearerAuth()
-  async getAllTicketsUser() {
-    return await this.ticketService.getAllTicketsUser();
-  }
+ 
 
-  // GET - Get list of tickets for admin (with pagination)
+ 
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.EMPLOYEE)
   @Get('admin')
-  @ApiOperation({ summary: 'Get all tickets for admin' })
+  @ApiOperation({ summary: 'Get all tickets ' })
   @ApiBearerAuth()
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
-  @ApiQuery({ name: 'is_used', required: false, type: Boolean, example: false })
-  @ApiQuery({ name: 'active', required: false, type: Boolean, example: true })
-  @ApiQuery({
-    name: 'search',
-    required: false,
-    type: String,
-    example: 'Avengers',
-  })
-  @ApiQuery({
-    name: 'startDate',
-    required: false,
-    type: String,
-    example: '2025-07-01',
-  })
-  @ApiQuery({
-    name: 'endDate',
-    required: false,
-    type: String,
-    example: '2025-07-03',
-  })
-  @ApiQuery({
-    name: 'sortBy',
-    required: false,
-    type: String,
-    example: 'schedule.id | ticketType | ticket.is_used | ticket.status',
-  })
-  @ApiQuery({
-    name: 'sortOrder',
-    required: false,
-    enum: ['ASC', 'DESC'],
-    example: 'ASC',
-  })
   async getAllTickets(@Query() query: TicketPaginationDto) {
     const { page = 1, take = 10, ...restFilters } = query;
     return this.ticketService.getAllTickets({
@@ -75,54 +38,23 @@ export class TicketController {
   // GET - Get tickets by user ID
   @Get('tickets-by-user-id')
   @ApiOperation({
-    summary: 'Get tickets by user ID with filters, search, sort',
+    summary: 'Get tickets by user ID',
   })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
-  @ApiQuery({ name: 'is_used', required: false, type: Boolean, example: false })
-  @ApiQuery({ name: 'active', required: false, type: Boolean, example: true })
-  @ApiQuery({
-    name: 'search',
-    required: false,
-    type: String,
-    example: 'Avengers',
-  })
-  @ApiQuery({
-    name: 'startDate',
-    required: false,
-    type: String,
-    example: '2025-07-01',
-  })
-  @ApiQuery({
-    name: 'endDate',
-    required: false,
-    type: String,
-    example: '2025-07-03',
-  })
-  @ApiQuery({
-    name: 'sortBy',
-    required: false,
-    type: String,
-    example: 'schedule.id | ticketType',
-  })
-  @ApiQuery({
-    name: 'sortOrder',
-    required: false,
-    enum: ['ASC', 'DESC'],
-    example: 'ASC',
-  })
+ 
   @ApiBearerAuth()
-  // async getTicketsByUserId(@Req() req, @Query() query: TicketPaginationDto) {
-  //   const user = req.user as JWTUserType;
-  //   const { page = 1, take = 10, ...restFilters } = query;
+  async getTicketsByUserId(@Request() req :{user:JWTUserType}, @Query() query: TicketPaginationDto) {
+    const user = req.user as JWTUserType;
+    const { page = 1, take = 10, ...restFilters } = query;
 
-  //   return this.ticketService.getTicketsByUserId({
-  //     page,
-  //     take: Math.min(take, 100),
-  //     ...restFilters,
-  //     userId: user.account_id,
-  //   });
-  // }
+    return this.ticketService.getTicketsByUserId({
+      page,
+      take: Math.min(take, 100),
+      ...restFilters,
+      userId: user.account_id,
+    });
+  }
 
   // GET - Get ticket by ID
   @Get(':id')

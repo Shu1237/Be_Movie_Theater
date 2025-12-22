@@ -17,7 +17,7 @@ export class ReportService {
     this.logger.log(' [CRON] Starting daily order statistics check...');
 
     try {
-      const result = await this.orderService.checkAllOrdersStatusByGateway();
+      const result = await this.orderService.dailyReportRevenue();
 
       if (result && Object.keys(result).length > 0) {
         this.logger.log(

@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Ticket } from './ticket';
 
 @Entity('ticket_type')
@@ -17,6 +24,12 @@ export class TicketType {
 
   @Column({ type: 'varchar', nullable: true })
   ticket_description?: string;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 
   @OneToMany(() => Ticket, (ticket) => ticket.ticketType)
   tickets: Ticket[];

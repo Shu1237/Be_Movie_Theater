@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Seat } from './seat';
 
 @Entity('seat_type')
@@ -15,6 +22,11 @@ export class SeatType {
   @Column({ type: 'text', nullable: true })
   seat_type_description?: string;
 
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
   @OneToMany(() => Seat, (seat) => seat.seatType)
   seats: Seat[];
 }

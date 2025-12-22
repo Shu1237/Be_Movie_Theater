@@ -12,7 +12,7 @@ export class CreateScheduleDto {
 
   @IsInt()
   @ApiProperty({ description: 'ID version', example: 1 })
-  id_Version: number;
+  version_id: number;
 
   @IsString()
   @ApiProperty({

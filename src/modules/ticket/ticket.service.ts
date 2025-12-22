@@ -1,3 +1,4 @@
+import { applySorting } from '@common/pagination/apply_sort';
 import { applyCommonFilters } from '@common/pagination/applyCommonFilters';
 import { applyPagination } from '@common/pagination/applyPagination';
 import { TicketPaginationDto } from '@common/pagination/dto/ticket/ticket-pagination.dto';
@@ -75,20 +76,7 @@ export class TicketService {
     };
   }
 
-  async getAllTicketsUser() :Promise<ReturnType<typeof this.summaryTicket>[]> {
-    const tickets = await this.ticketRepository.find({
-      where: { is_used: false, status: true },
-      relations: [
-        'schedule',
-        'schedule.movie',
-        'schedule.cinemaRoom',
-        'seat',
-        'seat.seatType',
-        'ticketType',
-      ],
-    });
-    return tickets.map((ticket) => this.summaryTicket(ticket));
-  }
+
   async getAllTickets(fillters: TicketPaginationDto) : Promise<ReturnType<typeof buildPaginationResponse>> {
     const qb = this.ticketRepository
       .createQueryBuilder('ticket')
@@ -105,18 +93,18 @@ export class TicketService {
     applyCommonFilters(qb, fillters, ticketFieldMapping);
 
     const allowedSortFields = [
-      'schedule.id',
       'ticketType.id',
       'ticket.is_used',
       'ticket.status',
+      'ticket.created_at',
     ];
-    // applySorting(
-    //   qb,
-    //   fillters.sortBy,
-    //   fillters.sortOrder,
-    //   allowedSortFields,
-    //   'schedule.id',
-    // );
+    applySorting(
+      qb,
+      fillters.sortBy,
+      fillters.sortOrder,
+      allowedSortFields,
+      'ticket.created_at',
+    );
 
     applyPagination(qb, {
       page: fillters.page,

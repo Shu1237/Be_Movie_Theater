@@ -21,19 +21,11 @@ import { JwtAuthGuard } from '@common/guards/jwt.guard';
 import { RolesGuard } from '@common/guards/roles.guard';
 import { SchedulePaginationDto } from '@common/pagination/dto/shedule/schedulePagination.dto';
 
-
 @Controller('schedules')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class ScheduleController {
-  constructor(private readonly scheduleService: ScheduleService) { }
-
-  // GET - Get list of schedules for user
-  @Get('user')
-  @ApiOperation({ summary: 'Get all schedules for users' })
-  async findAllUser() {
-    return await this.scheduleService.findAllUser();
-  }
+  constructor(private readonly scheduleService: ScheduleService) {}
 
   // GET - Get list of schedules for admin (with pagination)
   @UseGuards(RolesGuard)
@@ -42,52 +34,9 @@ export class ScheduleController {
   @ApiOperation({ summary: 'Get all schedules for admin' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
-  @ApiQuery({
-    name: 'movieName',
-    required: false,
-    type: String,
-    example: 'Avengers',
-  })
-  @ApiQuery({
-    name: 'cinemaRoomName',
-    required: false,
-    type: String,
-    example: 'Room 1',
-  })
-  @ApiQuery({
-    name: 'scheduleStartTime',
-    required: false,
-    type: String,
-    example: '2025-07-01',
-  })
-  @ApiQuery({
-    name: 'scheduleEndTime',
-    required: false,
-    type: String,
-    example: '2025-07-31',
-  })
-  @ApiQuery({ name: 'version_id', required: false, type: Number, example: 2 })
-  @ApiQuery({
-    name: 'is_deleted',
-    required: false,
-    type: Boolean,
-    example: false,
-  })
-  @ApiQuery({
-    name: 'sortBy',
-    required: false,
-    type: String,
-    example: 'schedule.id',
-  })
-  @ApiQuery({
-    name: 'sortOrder',
-    required: false,
-    enum: ['ASC', 'DESC'],
-    example: 'DESC',
-  })
   async findAll(@Query() query: SchedulePaginationDto) {
     const { page = 1, take = 10, ...restFilters } = query;
-    return await this.scheduleService.findAll({
+    return await this.scheduleService.findAllSchedule({
       page,
       take: Math.min(take, 100),
       ...restFilters,
@@ -98,7 +47,7 @@ export class ScheduleController {
   @Get(':id')
   @ApiOperation({ summary: 'Get schedule by ID' })
   async findOut(@Param('id') id: number) {
-    return await this.scheduleService.findOut(id);
+    return await this.scheduleService.findScheduleById(id);
   }
 
   // POST - Create new schedule
@@ -130,7 +79,7 @@ export class ScheduleController {
   async softDeleteSchedule(@Param('id', ParseIntPipe) id: number) {
     return await this.scheduleService.softDeleteSchedule(id);
   }
-  
+
   // PATCH - Restore soft-deleted schedule
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.EMPLOYEE)
@@ -141,13 +90,24 @@ export class ScheduleController {
   async restoreSchedule(@Param('id', ParseIntPipe) id: number) {
     return await this.scheduleService.restoreSchedule(id);
   }
- 
+
   // DELETE - Permanently delete schedule by ID
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.EMPLOYEE)
-  @Delete(':id')
+  @Delete(':id/soft-delete')
   @ApiOperation({ summary: 'Delete schedule by ID (admin, employee only)' })
-  async remove(@Param('id') id: number) {
-    return await this.scheduleService.softDelete(id);
+  async softDelete(@Param('id') id: number) {
+    return await this.scheduleService.softDeleteSchedule(id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.EMPLOYEE)
+  @Delete(':id')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Permanently delete an actor (admin, employee only)',
+  })
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return await this.scheduleService.removeSchedule(id);
   }
 }

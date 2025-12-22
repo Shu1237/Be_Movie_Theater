@@ -1,12 +1,7 @@
 import { Controller, Get, Post, Body, Query, Res, UseGuards, Request, Param, ParseIntPipe, Patch, InternalServerErrorException } from '@nestjs/common';
 import { OrderService } from './order.service';
-import { MomoService } from './payment-menthod/momo/momo.service';
-import { PayPalService } from './payment-menthod/paypal/paypal.service';
 import { CreateOrderBillDto } from './dto/order-bill.dto';
 import { ApiOperation, ApiBody, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
-import { VnpayService } from './payment-menthod/vnpay/vnpay.service';
-import { ZalopayService } from './payment-menthod/zalopay/zalopay.service';
-import { VisaService } from './payment-menthod/visa/visa.service';
 import { ConfigService } from '@nestjs/config';
 import { ScanQrCodeDto } from './dto/qrcode.dto';
 import { Roles } from '@common/decorator/roles.decorator';
@@ -16,6 +11,12 @@ import { JwtAuthGuard } from '@common/guards/jwt.guard';
 import { RolesGuard } from '@common/guards/roles.guard';
 import { OrderPaginationDto } from '@common/pagination/dto/order/orderPagination.dto';
 import { JWTUserType } from '@common/utils/type';
+import { MomoService } from './payment-gateway/momo/momo.service';
+import { PayPalService } from './payment-gateway/paypal/paypal.service';
+import { VisaService } from './payment-gateway/visa/visa.service';
+import { VnpayService } from './payment-gateway/vnpay/vnpay.service';
+import { ZalopayService } from './payment-gateway/zalopay/zalopay.service';
+
 
 @ApiBearerAuth()
 @Controller('order')
@@ -111,16 +112,16 @@ export class OrderController {
 
 
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN, Role.EMPLOYEE)
-  @Patch('admin/cancel-order/:orderId')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Admin/Employee cancel order', })
-  async adminCancelOrder(
-    @Param('orderId', ParseIntPipe) orderId: number,
-  ) {
-    return this.orderService.adminCancelOrder(orderId);
-  }
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.ADMIN, Role.EMPLOYEE)
+  // @Patch('admin/cancel-order/:orderId')
+  // @ApiBearerAuth()
+  // @ApiOperation({ summary: 'Admin/Employee cancel order', })
+  // async adminCancelOrder(
+  //   @Param('orderId', ParseIntPipe) orderId: number,
+  // ) {
+  //   return this.orderService.adminCancelOrder(orderId);
+  // }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN, Role.EMPLOYEE)

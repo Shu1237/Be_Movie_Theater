@@ -25,29 +25,21 @@ export class CinemaRoomService {
     createCinemaRoomDto: CreateCinemaRoomDto,
   ): Promise<CinemaRoom> {
     const cinemaRoom = this.cinemaRoomRepository.create(createCinemaRoomDto);
-    // check for duplicate name
-    const existingRoom = await this.cinemaRoomRepository.findOne({
-      where: { cinema_room_name: createCinemaRoomDto.cinema_room_name },
-    });
-    if (existingRoom) {
-      throw new BadRequestException(
-        'Cinema room with this name already exists',
-        'CINEMA_ROOM_DUPLICATE_NAME',
-      );
-    }
     return this.cinemaRoomRepository.save(cinemaRoom);
   }
 
-  async findAllCinemaRooms(
-    filters: CinemaRoomPaginationDto,
-  ) {
+  async findAllCinemaRooms(filters: CinemaRoomPaginationDto) {
     if (!filters) {
       throw new BadRequestException('Filters are required');
     }
 
     const qb = this.cinemaRoomRepository.createQueryBuilder('cinemaRoom');
     applyCommonFilters(qb, filters, cinemaRoomFieldMapping);
-    const allowedSortFields = ['cinemaRoom.id', 'cinemaRoom.cinema_room_name', 'cinemaRoom.created_at'];
+    const allowedSortFields = [
+      'cinemaRoom.id',
+      'cinemaRoom.cinema_room_name',
+      'cinemaRoom.created_at',
+    ];
     applySorting(
       qb,
       filters.sortBy,
@@ -72,27 +64,16 @@ export class CinemaRoomService {
 
     const activeCount = Number(countResult?.activeCount) || 0;
     const deletedCount = Number(countResult?.deletedCount) || 0;
-    return ResponseList.ok(
-      buildPaginationResponse(cinemaRooms, {
-        total,
-        page: filters.page,
-        take: filters.take,
-        activeCount,
-        deletedCount,
-      }),
-    );
+     return buildPaginationResponse<CinemaRoom>(cinemaRooms, {
+      total,
+      page: filters.page ,
+      take: filters.take ,
+      activeCount,
+      deletedCount,
+    });
   }
 
   async findCinemaRoomById(id: number): Promise<CinemaRoom> {
-    if (
-      id === null ||
-      id === undefined ||
-      isNaN(id) ||
-      typeof id !== 'number'
-    ) {
-      throw new BadRequestException('Valid ID is required');
-    }
-
     const cinemaRoom = await this.cinemaRoomRepository.findOne({
       where: { id },
     });
@@ -119,7 +100,10 @@ export class CinemaRoomService {
       relations: ['schedules', 'schedules.tickets'],
     });
     if (!cinemaRoom) {
-      throw new NotFoundException(`Cinema room with ID ${id} not found`, "CINEMA_ROOM_NOT_FOUND");
+      throw new NotFoundException(
+        `Cinema room with ID ${id} not found`,
+        'CINEMA_ROOM_NOT_FOUND',
+      );
     }
 
     const hasFutureTickets = cinemaRoom.schedules.some((schedule) =>
@@ -130,7 +114,7 @@ export class CinemaRoomService {
     if (hasFutureTickets) {
       throw new BadRequestException(
         'Cannot delete cinema room with future tickets',
-        "CINEMA_ROOM_HAS_FUTURE_TICKETS",
+        'CINEMA_ROOM_HAS_FUTURE_TICKETS',
       );
     }
 
@@ -143,7 +127,10 @@ export class CinemaRoomService {
       relations: ['schedules', 'schedules.tickets'],
     });
     if (!cinemaRoom) {
-      throw new NotFoundException(`Cinema Room with ID ${id} not found`, "CINEMA_ROOM_NOT_FOUND");
+      throw new NotFoundException(
+        `Cinema Room with ID ${id} not found`,
+        'CINEMA_ROOM_NOT_FOUND',
+      );
     }
 
     const hasFutureTickets = cinemaRoom.schedules.some((schedule) =>
@@ -154,10 +141,9 @@ export class CinemaRoomService {
     if (hasFutureTickets) {
       throw new BadRequestException(
         'Cannot delete cinema room with future tickets',
-        "CINEMA_ROOM_HAS_FUTURE_TICKETS",
+        'CINEMA_ROOM_HAS_FUTURE_TICKETS',
       );
     }
-
 
     await this.cinemaRoomRepository.update(id, { is_deleted: true });
   }
@@ -175,7 +161,7 @@ export class CinemaRoomService {
         'CINEMA_ROOM_NOT_DELETED',
       );
     }
-    
+
     await this.cinemaRoomRepository.update(id, { is_deleted: false });
   }
 }

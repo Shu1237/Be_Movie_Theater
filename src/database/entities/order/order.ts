@@ -14,20 +14,25 @@ import { OrderDetail } from './order-detail';
 import { Transaction } from './transaction';
 import { HistoryScore } from './history_score';
 import { OrderExtra } from './order-extra';
+import { StatusOrder } from '@common/enums/status-order.enum';
 
 @Entity('orders')
 export class Order {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
   total_prices: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
   original_tickets: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: false })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: StatusOrder,
+    default: StatusOrder.PENDING,
+  })
+  status: StatusOrder;
 
   @CreateDateColumn({ type: 'datetime' })
   order_date: Date;
@@ -38,7 +43,7 @@ export class Order {
   @Column({ type: 'varchar', length: 256, nullable: true })
   customer_id: string;
 
-  @ManyToOne(() => User, (user) => user.orders, { nullable: false })
+  @ManyToOne(() => User, (user) => user.orders)
   @JoinColumn({ name: 'user_id' })
   user: User;
 
@@ -58,11 +63,8 @@ export class Order {
   })
   orderExtras: OrderExtra[];
 
-  @OneToOne(() => Transaction, (transaction) => transaction.order, {
-    nullable: true,
-  })
-  @JoinColumn()
-  transaction: Transaction;
+  @OneToMany(() => Transaction, (transaction) => transaction.order)
+  transactions: Transaction[];
 
   @OneToOne(() => HistoryScore, (historyScore) => historyScore.order, {
     nullable: true,
