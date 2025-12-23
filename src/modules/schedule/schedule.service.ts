@@ -176,13 +176,14 @@ export class ScheduleService {
       'schedule.id',
       'movie.name',
       'version.id',
+      'schedule.created_at',
     ];
     applySorting(
       qb,
       fillters.sortBy,
       fillters.sortOrder,
       allowedFields,
-      'schedule.id',
+      'schedule.created_at',
     );
 
     applyPagination(qb, {

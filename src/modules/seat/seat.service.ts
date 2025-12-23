@@ -169,65 +169,7 @@ export class SeatService {
 
     throw new BadRequestException('Seat is not soft-deleted');
   }
-  private async getScheduleSeats(
-    scheduleId: number,
-    seatIds: string[],
-  ): Promise<ScheduleSeat[]> {
-    const scheduleSeats = await this.scheduleSeatRepository.find({
-      where: {
-        schedule: { id: scheduleId },
-        seat: { id: In(seatIds) },
-        status: StatusSeat.NOT_YET,
-      },
-    });
-    if (!scheduleSeats || scheduleSeats.length === 0) {
-      throw new NotFoundException(
-        `No available seats found for schedule ID ${scheduleId} or seats booked`,
-      );
-    }
-    return scheduleSeats;
-  }
-
-  async holdSeat(data: HoldSeatType, req: JWTUserType): Promise<void> {
-    const { seatIds, schedule_id } = data;
-    const user = req;
-
-    if (!seatIds || seatIds.length === 0) {
-      throw new BadRequestException('No seats selected');
-    }
-
-    const seats = await this.getScheduleSeats(schedule_id, seatIds);
-    if (seats.length !== seatIds.length) {
-      throw new NotFoundException('Some selected seats are not available');
-    }
-
-    const redisKey = `seat-hold-${schedule_id}-${user.account_id}`;
-
-    try {
-      await this.redisClient.set(
-        redisKey,
-        JSON.stringify({ seatIds, schedule_id, userId: user.account_id }),
-        'EX',
-        600,
-      );
-    } catch (error) {
-      throw new BadRequestException('Failed to hold seats');
-    }
-  }
-
-  async cancelHoldSeat(data: HoldSeatType, req: JWTUserType): Promise<void> {
-    const { schedule_id } = data;
-    const user = req;
-
-    const redisKey = `seat-hold-${schedule_id}-${user.account_id}`;
-    const redisRaw = await this.redisClient.get(redisKey);
-
-    if (!redisRaw) {
-      throw new NotFoundException('No held seats found for this schedule');
-    }
-
-    await this.redisClient.del(redisKey);
-  }
+ 
   // Shared validation helper
   private async validateSeatsExist(
     seatIds: string[],
@@ -474,4 +416,72 @@ export class SeatService {
       message: 'Seats restored successfully',
     };
   }
+
+
+
+
+
+   private async getScheduleSeats(
+    scheduleId: number,
+    seatIds: string[],
+  ): Promise<ScheduleSeat[]> {
+    const scheduleSeats = await this.scheduleSeatRepository.find({
+      where: {
+        schedule: { id: scheduleId },
+        seat: { id: In(seatIds) },
+        status: StatusSeat.NOT_YET,
+      },
+    });
+    if (!scheduleSeats || scheduleSeats.length === 0) {
+      throw new NotFoundException(
+        `No available seats found for schedule ID ${scheduleId} or seats booked`,
+      );
+    }
+    return scheduleSeats;
+  }
+
+  async holdSeat(data: HoldSeatType, req: JWTUserType): Promise<void> {
+    const { seatIds, schedule_id } = data;
+    const user = req;
+
+    if (!seatIds || seatIds.length === 0) {
+      throw new BadRequestException('No seats selected');
+    }
+
+    const seats = await this.getScheduleSeats(schedule_id, seatIds);
+    if (seats.length !== seatIds.length) {
+      throw new NotFoundException('Some selected seats are not available');
+    }
+
+    const redisKey = `seat-hold-${schedule_id}-${user.account_id}`;
+
+    try {
+      await this.redisClient.set(
+        redisKey,
+        JSON.stringify({ seatIds, schedule_id}),
+        'EX',
+        600,
+      );
+    } catch (error) {
+      throw new BadRequestException('Failed to hold seats');
+    }
+  }
+
+  async cancelHoldSeat(data: HoldSeatType, req: JWTUserType): Promise<void> {
+    const { schedule_id } = data;
+    const user = req;
+
+    const redisKey = `seat-hold-${schedule_id}-${user.account_id}`;
+    const redisRaw = await this.redisClient.get(redisKey);
+
+    if (!redisRaw) {
+      throw new NotFoundException('No held seats found for this schedule');
+    }
+
+    await this.redisClient.del(redisKey);
+  }
 }
+
+
+
+

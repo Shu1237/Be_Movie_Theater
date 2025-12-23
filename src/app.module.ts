@@ -56,7 +56,7 @@ import { GenreModule } from '@modules/gerne/gerne.module';
         synchronize: true,
         autoLoadEntities: true,
       }),
-      inject: [ConfigService],
+      inject: [ConfigService], 
     }),
 
 

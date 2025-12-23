@@ -1,7 +1,28 @@
-import { Controller, Get, Post, Body, Query, Res, UseGuards, Request, Param, ParseIntPipe, Patch, InternalServerErrorException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Query,
+  Res,
+  UseGuards,
+  Request,
+  Param,
+  ParseIntPipe,
+  Patch,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import type { Response } from 'express';
 import { OrderService } from './order.service';
 import { CreateOrderBillDto } from './dto/order-bill.dto';
-import { ApiOperation, ApiBody, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiBody,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+  ApiExcludeEndpoint,
+} from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { ScanQrCodeDto } from './dto/qrcode.dto';
 import { Roles } from '@common/decorator/roles.decorator';
@@ -17,7 +38,6 @@ import { VisaService } from './payment-gateway/visa/visa.service';
 import { VnpayService } from './payment-gateway/vnpay/vnpay.service';
 import { ZalopayService } from './payment-gateway/zalopay/zalopay.service';
 
-
 @ApiBearerAuth()
 @Controller('order')
 export class OrderController {
@@ -29,10 +49,7 @@ export class OrderController {
     private readonly vnpayService: VnpayService,
     private readonly zalopayService: ZalopayService,
     private readonly configService: ConfigService,
-  ) { }
-
-
-
+  ) {}
 
   // POST /order - Create new order
   @UseGuards(JwtAuthGuard)
@@ -40,7 +57,10 @@ export class OrderController {
   @ApiOperation({ summary: 'Create a new order' })
   @ApiBearerAuth()
   @ApiBody({ type: CreateOrderBillDto })
-  createOrder(@Body() body: CreateOrderBillDto, @Request() req :{user: JWTUserType, headers: any, socket: any}) {
+  createOrder(
+    @Body() body: CreateOrderBillDto,
+    @Request() req: { user: JWTUserType; headers: any; socket: any },
+  ) {
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     if (!clientIp) {
       throw new InternalServerErrorException('Client IP address not found');
@@ -83,7 +103,6 @@ export class OrderController {
   //   );
   // }
 
-
   // // POST /order/admin/update-order/:orderId - Admin/Employee update pending order
   // @UseGuards(JwtAuthGuard, RolesGuard)
   // @Roles(Role.ADMIN, Role.EMPLOYEE)
@@ -109,9 +128,6 @@ export class OrderController {
   //   );
   // }
 
-
-
-
   // @UseGuards(JwtAuthGuard, RolesGuard)
   // @Roles(Role.ADMIN, Role.EMPLOYEE)
   // @Patch('admin/cancel-order/:orderId')
@@ -131,16 +147,8 @@ export class OrderController {
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
   @ApiResponse({ status: 200, description: 'List of all orders' })
-  async getAllOrders(
-
-    @Query() query: OrderPaginationDto,
-  ) {
-    const {
-      page = 1,
-      take = 10,
-      status,
-      ...restFilters
-    } = query;
+  async getAllOrders(@Query() query: OrderPaginationDto) {
+    const { page = 1, take = 10, status, ...restFilters } = query;
 
     const statusValue: StatusOrder | undefined =
       status === 'all' ? undefined : (status as StatusOrder);
@@ -196,18 +204,24 @@ export class OrderController {
   // Payment callback endpoints (excluded from Swagger)
 
   // GET /order/momo/return - MoMo payment callback
-  // @ApiExcludeEndpoint()
-  // @Get('momo/return')
-  // async handleMomoReturn(@Query() query: any, @Res() res: Response) {
-  //   try {
-  //     const result = await this.momoService.handleReturn(query);
-  //     return res.redirect(result);
-  //   } catch (error) {
-  //     const failureUrl = `${this.configService.get<string>('redirectFE.url')}?status=failure ` || 'http://localhost:3000/booking/result?status=failure ';
-  //     console.error('PayPal payment error:', error);
-  //     return res.redirect(failureUrl);
-  //   }
-  // }
+  @ApiExcludeEndpoint()
+  @Get('momo/return')
+  async handleMomoReturn(@Query() query: any, @Res() res: Response): Promise<any> {
+    try {
+      const result = await this.momoService.handleReturn(query);
+      return res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      // const failureUrl = `${this.configService.get<string>('redirectFE.url')}?status=failure ` || 'http://localhost:3000/booking/result?status=failure ';
+      console.error('PayPal payment error:', error);
+      return res.status(400).json({
+        success: false,
+        data: error.message,
+      });
+    }
+  }
 
   // // GET /order/paypal/success/return - PayPal success callback
   // @ApiExcludeEndpoint()
@@ -279,17 +293,25 @@ export class OrderController {
   // }
 
   // GET /order/vnpay/return - VnPay callback
-  // @ApiExcludeEndpoint()
-  // @Get('vnpay/return')
-  // async handleVnPayReturn(@Query() query: any, @Res() res: Response) {
-  //   try {
-  //     const result = await this.vnpayService.handleReturnVnPay(query);
-  //     return res.redirect(result);
-  //   } catch (error) {
-  //     const failureUrl = `${this.configService.get<string>('redirectFE.url')}?status=failure ` || 'http://localhost:3000/booking/result?status=failure ';
-  //     return res.redirect(failureUrl);
-  //   }
-  // }
+  @ApiExcludeEndpoint()
+  @Get('vnpay/return')
+  async handleVnPayReturn(@Query() query: any, @Res() res: Response) {
+    try {
+      const result = await this.vnpayService.handleReturnVnPay(query);
+      return res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      // const failureUrl = `${this.configService.get<string>('redirectFE.url')}?status=failure ` || 'http://localhost:3000/booking/result?status=failure ';
+      // return res.redirect(failureUrl);
+      console.error('VnPay payment error:', error);
+      return res.status(400).json({
+        success: false,
+        data: error.message,
+      });
+    }
+  }
 
   // // GET /order/zalopay/return - ZaloPay callback
   // @ApiExcludeEndpoint()

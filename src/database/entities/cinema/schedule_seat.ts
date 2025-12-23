@@ -15,8 +15,8 @@ export class ScheduleSeat {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'tinyint', default: StatusSeat.NOT_YET })
-  status: number;
+  @Column({ type: 'enum', enum: StatusSeat, default: StatusSeat.NOT_YET })
+  status: StatusSeat;
 
   @ManyToOne(() => Schedule, (schedule) => schedule.scheduleSeats)
   @JoinColumn({ name: 'schedule_id' })

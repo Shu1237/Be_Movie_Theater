@@ -4,7 +4,7 @@ import { Repository, Between } from 'typeorm';
 import { Order } from '@database/entities/order/order';
 import { PaymentMethod } from '@database/entities/order/payment-method';
 import { DailyTransactionSummary } from '@database/entities/order/daily_transaction_summary';
-import { PaymentGateway } from '@common/enums/payment_gatewat.enum';
+import { PaymentGateway } from '@common/enums/payment_gateway.enum';
 import { Method } from '@common/enums/payment-menthod.enum';
 import { StatusOrder } from '@common/enums/status-order.enum';
 import { formatDate } from '@common/utils/helper';

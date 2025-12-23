@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 import Stripe from 'stripe';
-import { PaymentGateway } from '@common/enums/payment_gatewat.enum';
+import { PaymentGateway } from '@common/enums/payment_gateway.enum';
 import { StatusOrder } from '@common/enums/status-order.enum';
 import { MyGateWay } from '@common/gateways/seat.gateway';
 import { MailService } from '@common/mail/mail.service';

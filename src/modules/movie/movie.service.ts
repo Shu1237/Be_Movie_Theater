@@ -72,7 +72,7 @@ export class MovieService {
     const qb = this.movieRepository
       .createQueryBuilder('movie')
       .leftJoinAndSelect('movie.actors', 'actor')
-      .leftJoinAndSelect('movie.gernes', 'gerne')
+      .leftJoinAndSelect('movie.genres', 'genre')
       .leftJoinAndSelect('movie.versions', 'version');
 
     applyCommonFilters(qb, fillters, movieFieldMapping);
@@ -82,9 +82,9 @@ export class MovieService {
       'movie.name',
       'movie.director',
       'movie.nation',
-      'gerne.genre_name',
-      'actor.name',
-      'version.name',
+      'genre.genre_name',
+      'actor.actor_name',
+      'version.version_name',
       'movie.created_at',
     ];
     applySorting(

@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Ticket } from './ticket';
+import { AudienceType } from '@common/enums/audience_type.enum';
 
 @Entity('ticket_type')
 export class TicketType {
@@ -19,8 +20,11 @@ export class TicketType {
   @Column({ type: 'decimal', nullable: false, precision: 10, scale: 2 })
   discount: string;
 
-  @Column({ type: 'varchar', nullable: false })
-  audience_type: string;
+  @Column({
+    type: 'enum',
+    enum: AudienceType,
+  })
+  audience_type: AudienceType;
 
   @Column({ type: 'varchar', nullable: true })
   ticket_description?: string;

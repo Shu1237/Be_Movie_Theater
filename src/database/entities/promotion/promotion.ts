@@ -5,6 +5,8 @@ import {
   OneToMany,
   ManyToOne,
   JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Order } from '../order/order';
 import { PromotionType } from './promtion_type';
@@ -34,6 +36,12 @@ export class Promotion {
 
   @Column({ type: 'int', nullable: false })
   exchange: number;
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 
   @Column({ type: 'boolean', default: true })
   is_active: boolean;

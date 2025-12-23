@@ -111,7 +111,7 @@ export abstract class AbstractPaymentService {
             await this.scheduleSeatRepository.save(seat);
         }
     }
-    async handleReturnSuccess(transaction: Transaction): Promise<string> {
+    async handleReturnSuccess(transaction: Transaction): Promise<any>{
         const order = transaction.order;
         transaction.status = StatusOrder.SUCCESS;
         order.status = StatusOrder.SUCCESS;
@@ -203,34 +203,23 @@ export abstract class AbstractPaymentService {
         });
 
 
-        return `${this.configService.get<string>('redirectFE.url')}?status=success&orderId=${savedOrder.id}&total=${savedOrder.total_prices}&paymentMethod=${transaction.paymentMethod.name}`;
+        // return `${this.configService.get<string>('redirectFE.url')}?status=success&orderId=${savedOrder.id}&total=${savedOrder.total_prices}&paymentMethod=${transaction.paymentMethod.name}`;
+        return {
+            orderId: savedOrder.id,
+            total: savedOrder.total_prices,
+            paymentMethod: transaction.paymentMethod.name,
+            message: 'Payment successful',
+        }
     }
-    handleReturnFailed(transaction: Transaction) {
-        // const order = transaction.order;
-
-        // // Change seat status from HELD to NOT_YET when payment fails
-        // for (const detail of order.orderDetails) {
-        //     const ticket = detail.ticket;
-        //     if (ticket?.seat && ticket.schedule) {
-        //         await this.changeStatusScheduleSeatToFailed([ticket.seat.id], ticket.schedule.id);
-        //     }
-        // }
-
-        // // Update order extras status to FAILED
-        // if (order.orderExtras && order.orderExtras.length > 0) {
-        //     for (const extra of order.orderExtras) {
-        //         extra.status = StatusOrder.FAILED;
-        //         await this.orderExtraRepository.save(extra);
-        //     }
-        // }
-
-        // // Notify via socket that seats are cancelled
-        // this.gateway.onCancelBookSeat({
-        //     schedule_id: order.orderDetails[0].ticket.schedule.id,
-        //     seatIds: order.orderDetails.map(detail => detail.ticket.seat.id),
-        // });
-
-        return `${this.configService.get<string>('redirectFE.url')}?status=failure `;
+  async  handleReturnFailed(transaction: Transaction) {
+        // trasaction convert faild 
+        // keep order
+        transaction.status = StatusOrder.FAILED;
+        await this.transactionRepository.save(transaction);
+        // return `${this.configService.get<string>('redirectFE.url')}?status=failure `;
+        return {
+            message: 'Payment failed'
+        }
     }
 
     // async sendOrderConfirmationEmail(order: Order, transaction: Transaction) {

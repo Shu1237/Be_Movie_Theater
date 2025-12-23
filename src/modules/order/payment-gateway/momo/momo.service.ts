@@ -11,7 +11,7 @@ import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { AbstractPaymentService } from '../base/abstract-payment.service';
-import { PaymentGateway } from '@common/enums/payment_gatewat.enum';
+import { PaymentGateway } from '@common/enums/payment_gateway.enum';
 import { StatusOrder } from '@common/enums/status-order.enum';
 import { MyGateWay } from '@common/gateways/seat.gateway';
 import { MailService } from '@common/mail/mail.service';

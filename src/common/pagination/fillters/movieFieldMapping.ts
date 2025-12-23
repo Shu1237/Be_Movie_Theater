@@ -26,8 +26,8 @@ export const movieFieldMapping: Record<string, FilterField> = {
     field: 'actor.id',
     operator: '=',
   },
-  gerne_id: {
-    field: 'gerne.id',
+  genre_id: {
+    field: 'genre.id',
     operator: '=',
   },
   version_id: {

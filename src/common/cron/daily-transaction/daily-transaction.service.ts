@@ -1,4 +1,4 @@
-import { PaymentGateway } from '@common/enums/payment_gatewat.enum';
+import { PaymentGateway } from '@common/enums/payment_gateway.enum';
 import { OrderService } from '@modules/order/order.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';

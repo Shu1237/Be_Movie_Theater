@@ -26,6 +26,11 @@ export interface ProductWithTotal {
   total: number;
 }
 
+enum DiscountType {
+  PERCENTAGE = 'percentage',
+  FIXED = 'fixed',
+}
+
 @Injectable()
 export class OrderCalculationService {
   calculateSeatPrices(
@@ -74,7 +79,7 @@ export class OrderCalculationService {
     totalBeforePromotion: number,
   ): { promotionAmount: number; isPercentage: boolean } {
     const promotionDiscount = parseFloat(promotion?.discount ?? '0');
-    const isPercentage = promotion?.promotionType?.type === 'percentage';
+    const isPercentage = promotion?.promotionType?.type === DiscountType.PERCENTAGE;
 
     const promotionAmount = isPercentage
       ? Math.round(totalBeforePromotion * (promotionDiscount / 100))

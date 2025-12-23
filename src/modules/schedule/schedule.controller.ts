@@ -30,8 +30,8 @@ export class ScheduleController {
   // GET - Get list of schedules for admin (with pagination)
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.EMPLOYEE)
-  @Get('admin')
-  @ApiOperation({ summary: 'Get all schedules for admin' })
+  @Get()
+  @ApiOperation({ summary: 'Get all schedules ' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'take', required: false, type: Number, example: 10 })
   async findAll(@Query() query: SchedulePaginationDto) {
@@ -94,7 +94,7 @@ export class ScheduleController {
   // DELETE - Permanently delete schedule by ID
   @UseGuards(RolesGuard)
   @Roles(Role.ADMIN, Role.EMPLOYEE)
-  @Delete(':id/soft-delete')
+  @Patch(':id/soft-delete')
   @ApiOperation({ summary: 'Delete schedule by ID (admin, employee only)' })
   async softDelete(@Param('id') id: number) {
     return await this.scheduleService.softDeleteSchedule(id);

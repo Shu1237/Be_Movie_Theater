@@ -3,7 +3,7 @@ import { IsOptional, IsString, IsIn, IsEnum } from 'class-validator';
 import { BasePaginationDto } from '../basePagination.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { StatusOrderWithAll } from '@common/enums/status-order.enum';
-import { PaymentGateway } from '@common/enums/payment_gatewat.enum';
+import { PaymentGateway } from '@common/enums/payment_gateway.enum';
 
 
 export class OrderPaginationDto extends BasePaginationDto {
