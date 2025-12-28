@@ -50,8 +50,7 @@ export class AuthController {
 
   // POST - Refresh token
   // @UseGuards(RefreshGuard)
-  @Post('refreshToken')
-  @ApiBearerAuth()
+  @Post('refresh_token')
   @ApiOperation({ summary: 'Refresh JWT using refresh token' })
   @ApiBody({ type: RefreshTokenDto })
   refreshToken(@Body() body: RefreshTokenDto) {
