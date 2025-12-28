@@ -22,7 +22,7 @@ import { Role } from '@common/enums/roles.enum';
 import { JwtAuthGuard } from '@common/guards/jwt.guard';
 import { RolesGuard } from '@common/guards/roles.guard';
 
-@Controller('actor')
+@Controller('actors')
 export class ActorController {
   constructor(private readonly actorService: ActorService) {}
 
